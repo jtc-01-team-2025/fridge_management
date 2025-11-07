@@ -56,6 +56,18 @@ podman-compose up -d
 - フロントエンド: http://localhost:5173  
 - バックエンド: http://localhost:8000/api
 
+- コンテナ挙動確認
+```bash
+podman-compose ps
+```
+
+下記のように出れば動いている
+| CONTAINER ID | IMAGE                                       | COMMAND               | CREATED         | STATUS         | PORTS                  | NAMES             |
+|---------------|---------------------------------------------|------------------------|-----------------|----------------|------------------------|------------------|
+| <ID>  | localhost/fridge_management_backend:latest  | uvicorn app.main:...  | 17 seconds ago  | Up 17 seconds  | 0.0.0.0:8000->8000/tcp | fastapi-backend  |
+| <ID>  | localhost/fridge_management_frontend:latest | nginx -g daemon o...  | 17 seconds ago  | Up 17 seconds  | 0.0.0.0:5173->80/tcp   | react-frontend   |
+
+
 ## 動作確認
 http://localhost:5173 にアクセスして画面が表示されれば成功です。
 
