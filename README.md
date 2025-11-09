@@ -47,9 +47,24 @@ VITE_API_URL=http://localhost:8000/api
 ```bash
 podman machine start
 ```
+
 3. コンテナ群を起動
 ```bash
 podman-compose up -d
+```
+
+3.1 開発環境の場合（ホットリロード機能）
+```bash
+podman-compose -f docker-compose.dev.yml up -d --build
+```
+
+すべてのコンテナを停止・削除する場合：
+```bash
+# すべてのコンテナを停止
+podman stop -a
+
+# すべてのコンテナを削除
+podman rm -a
 ```
 
 4. 起動後:
@@ -85,6 +100,8 @@ podman machine stop
 ## 開発
 ```bash
 docker compose -f docker-compose.dev.yml up -d
+podman-compose -f docker-compose.dev.yml up -d
+
 ```
 ---
 
