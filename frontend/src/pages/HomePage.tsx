@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom"; // 1. useNavigate をインポート
 import { fetchData, type ApiResponse } from "../Client";
 import "../styles/HomePage.css";
 import { generateTestItems } from "../utils/generateDummyData";
 import Footer from "../components/Footer";
+import PopUp from "../components/PopUP";
 
 // 食材データの型定義（仮）
 // interface InventoryItem {
@@ -12,10 +13,9 @@ import Footer from "../components/Footer";
 //   isUrgent: boolean;
 // }
 
-
-
 function HomePage() {
   const [data, setData] = useState<ApiResponse | null>(null);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
   const navigate = useNavigate(); // 2. navigate 関数を取得
 
   // API 疎通確認ロジック
@@ -57,10 +57,44 @@ function HomePage() {
   //   { name: "豚肉", expiry: "2025/12/20", isUrgent: false },
   // ];
 
-  const items = generateTestItems(Math.floor(Math.random() * 11));
+  //useMemo() を使って items をメモ化
+  const items = useMemo(() => generateTestItems(Math.floor(Math.random() * 11)), []);
 
+  const togglePopup = () => setIsPopupVisible(!isPopupVisible);
   return (
     <div className="home-container">
+      <PopUp isVisible={isPopupVisible} onClose={togglePopup}>
+        <div className="item-list-panel">
+          {items.length === 0 ? (
+            <p>期限が近い食材はありません。</p>
+          ) : (
+            <>
+              <h3>期限が近い、期限切れの食材一覧</h3>
+              <ul className="popup-item-list">
+                {items
+                  .filter((item) => {
+                    const today = new Date();
+                    const expiryDate = new Date(item.expiry);
+                    const diffDays =
+                      (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+                    return diffDays <= 7;
+                  })
+                  .sort((a, b) => new Date(a.expiry).getTime() - new Date(b.expiry).getTime())
+                  .map((item, index) => (
+                    <li key={index}>
+                      <div className="item-left">
+                        <div className="item-info">
+                          <h3>{item.name}</h3>
+                          <p>消費期限：{item.expiry}</p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </>
+          )}
+        </div>
+      </PopUp>
       <h2>冷蔵庫管理</h2>
       <div className="main-content">
         <div className="action-buttons-panel">
@@ -70,7 +104,7 @@ function HomePage() {
 
           {/* 💡 期限が近い、期限切れの食材 (パス: /inventory へ遷移) 
              ここではフィルタリング済みのリストとして InventoryListPage を再利用します */}
-          <button className="action-button secondary" onClick={() => navigate("/inventory")}>
+          <button className="action-button secondary" onClick={togglePopup}>
             期限が近い、期限切れの食材 (リストへ)
           </button>
 
