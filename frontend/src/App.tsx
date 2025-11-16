@@ -23,7 +23,7 @@
 // export default App;
 
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import HomePage from './pages/HomePage';
 import InventoryListPage from './pages/InventoryListPage';
