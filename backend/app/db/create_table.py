@@ -1,28 +1,38 @@
-from models import * 
-from db import Base, engine, session
+# app/db/create_table.py
+
+from datetime import datetime
 import os
 
-SQLITE3_NAME = "test_models.db" # 実際の SQLite ファイル名
+from app.db.database import Base, engine, session
+from app.db.models import FridgeContents  # ← ここを Item から修正
+
+SQLITE3_NAME = "fridge.db"  # SQLite ファイル名
 
 if __name__ == "__main__":
-    path = SQLITE3_NAME
-    if not os.path.isfile(path):
+    Base.metadata.create_all(engine)
+    print("Tables created!")
 
-        #テーブルの作成
-        Base.metadata.create_all(db.engine)
-        print("Tables created!")
+    # サンプルデータ
+    items = [
+        FridgeContents(
+            name="バナナ",
+            category="フルーツ",
+            date_purchase=datetime(2025, 11, 5),
+            date_expiration=datetime(2025, 11, 12)
+        ),
+        FridgeContents(
+            name="牛乳",
+            category="乳製品",
+            date_purchase=datetime(2025, 11, 6),
+            date_expiration=datetime(2025, 11, 10)
+        )
+    ]
 
-    #サンプルデータの作成
-    task = Task(
-        itemID=1,
-        name="バナナ",
-        category="フルーツ",
-        date_purchase=datetime(2025,11,5), # 2025/11/5
-        date_expiration=datetime(2025,11,12)
-    )
+    # DB に INSERT
+    for it in items:
+        session.add(it)
 
-    print(task)
+    session.commit()
+    session.close()
 
-    db.session.add(task)
-    db.session.commit()
-    db.session.close() # セッションを閉じる
+    print("Test data inserted!")

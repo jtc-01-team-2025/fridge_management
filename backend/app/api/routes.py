@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.api import crud, schemas
 from app.db.database import get_db #DBセッション提供関数の取り込み: Depends(get_db)で、リクエストごとにDBセッションを用意してもらうために使う
 from app.services import fridge_service
-
+from app.api.schemas import FridgeContentsCreate, FridgeContents, ItemCreate  # <- ItemCreateを追加
 
 router = APIRouter()
 
@@ -14,8 +14,8 @@ def read_root():
 
 # 入力されたデータの格納用endpoint
 @router.post("/items/", response_model=schemas.FridgeContents)
-def create_item(item: schemas.FridgeContentsCreate, db: Session = Depends(get_db)): #引数item: リクエストボディのJSONをFridgeContentsCreateスキーマで受け取る（nameとdate_expirationなど）。
-    return crud.create_item(db=db, item=item)
+def create_items(data: ItemCreate):
+    return fridge_service.create_items(data.items)
 
 
 # データ一覧の取得用endpoint（賞味期限順に全ての食材）
