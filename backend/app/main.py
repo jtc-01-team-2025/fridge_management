@@ -13,9 +13,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Prefix API routes with /api
-app.include_router(routes.router, prefix="/api")
+# Prefix API routes 
+app.include_router(routes.router,)
 
-# @app.get("/")
-# async def read_root():
-#     return {"message": "Hello from FastAPI!"}
+@app.get("/")
+async def read_root():
+    return {"message": "Hello from FastAPI!"}

@@ -1,15 +1,33 @@
 version: "3.9"
 
+
+
 services:
+
+  db:
+    image: mysql:8.0
+    container_name: fridge-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=fridge_db
+      - MYSQL_USER=fridge_user
+      - MYSQL_PASSWORD=fridge_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
   backend:
     build: ./backend
     container_name: fastapi-backend
     ports:
       - "8000:8000"
-    #volumes:
-    #  - ./backend:/app
+    volumes:
+      - ./backend:/app
     environment:
       - PYTHONUNBUFFERED=1
+    depends_on:
+      - db
 
   frontend:
     build: ./frontend
@@ -18,3 +36,7 @@ services:
       - "5173:80"
     depends_on:
       - backend
+
+# top-level でボリューム定義
+volumes:
+  db_data:

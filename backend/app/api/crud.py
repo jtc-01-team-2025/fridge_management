@@ -8,7 +8,7 @@ def create_item(db: Session, item: schemas.FridgeContentsCreate):
     db_item = models.FridgeContents(
         name=item.name,
         category=item.category,
-        date_input=date.today(),  # 自動生成
+        date_purchase=item.date_purchase,  
         date_expiration=item.date_expiration
     )
 

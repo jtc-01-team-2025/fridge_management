@@ -1,10 +1,27 @@
 from pydantic import BaseModel
 from datetime import date
 
+from typing import List
+
 class FridgeContentsBase(BaseModel):
     name: str
     category: str
+    date_purchase: date
     date_expiration: date
+
+class Item(BaseModel):
+    itemID: int
+    name: str
+    category: str
+    date_purchase: date
+    date_expiration: date
+    model_config = {
+        "from_attributes": True  # ←これを追加
+    }
+
+class ItemCreate(BaseModel):
+    items: List[Item]
+
 
 # ユーザーが食材を登録するときに使う
 class FridgeContentsCreate(FridgeContentsBase):
@@ -14,7 +31,7 @@ class FridgeContentsCreate(FridgeContentsBase):
 # レスポンス用のスキーマ
 class FridgeContents(FridgeContentsBase):
     itemID: int
-    date_input: date
+    
 
     class Config:
-        orm_mode = True
+        from_attributes = True
