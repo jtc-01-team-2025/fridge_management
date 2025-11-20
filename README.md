@@ -39,8 +39,10 @@ project-root/
 
 ## 起動方法
 1. /frontend/の中に`.env` ファイルを作成して下記をペースト(＊初回のみ必須)
+  APIを取得する環境関数を作成しました。VITE_USE_APIない場合ダミーデータを取得します。
 ```bash
 VITE_API_URL=http://localhost:8000/api
+VITE_USE_API=true
 ```
 
 2. Podman VM を起動

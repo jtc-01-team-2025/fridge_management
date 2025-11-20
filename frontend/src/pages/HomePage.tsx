@@ -167,13 +167,14 @@ function HomePage() {
   const [data, setData] = useState<FoodType[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const navigate = useNavigate(); // 2. navigate 関数を取得
+  const useApiData = import.meta.env.VITE_USE_API === "true";
 
   // API 疎通確認ロジック
   useEffect(() => {
     fetchData()
       .then((res) => setData(res))
       .catch((err) => console.error(err));
-  }, []);
+  }, [useApiData]);
 
   const getExpirationStatus = (expirationDate: string) => {
     let label = "";
@@ -208,7 +209,10 @@ function HomePage() {
   // ];
 
   //useMemo() を使って items をメモ化
-  const items = useMemo(() => generateTestItems(Math.floor(Math.random() * 11)), []);
+  const items = useMemo(
+    () => (useApiData ? data : generateTestItems(Math.floor(Math.random() * 11))),
+    [useApiData, data]
+  );
 
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
   return (
@@ -229,7 +233,10 @@ function HomePage() {
                       (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
                     return diffDays <= 7;
                   })
-                  .sort((a, b) => new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime())
+                  .sort(
+                    (a, b) =>
+                      new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime()
+                  )
                   .map((item, index) => (
                     <li key={index}>
                       <div className="item-left">
