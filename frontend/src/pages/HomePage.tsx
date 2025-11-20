@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom"; // 1. useNavigate をインポート
-import { fetchData, type ApiResponse } from "../Client";
-import "../styles/HomePage.css";
+import { fetchData } from "../Client";
+import "../styles/Homepage.css";
 import { generateTestItems } from "../utils/generateDummyData";
 import Footer from "../components/Footer";
 import PopUp from "../components/PopUP";
+import type { FoodType } from "../types/FoodType";
 
 // 食材データの型定義（仮）
 // interface InventoryItem {
@@ -14,7 +15,7 @@ import PopUp from "../components/PopUP";
 // }
 
 function HomePage() {
-  const [data, setData] = useState<ApiResponse | null>(null);
+  const [data, setData] = useState<FoodType[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const navigate = useNavigate(); // 2. navigate 関数を取得
 
@@ -74,18 +75,18 @@ function HomePage() {
                 {items
                   .filter((item) => {
                     const today = new Date();
-                    const expiryDate = new Date(item.expiry);
+                    const expiryDate = new Date(item.date_expiration);
                     const diffDays =
                       (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
                     return diffDays <= 7;
                   })
-                  .sort((a, b) => new Date(a.expiry).getTime() - new Date(b.expiry).getTime())
+                  .sort((a, b) => new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime())
                   .map((item, index) => (
                     <li key={index}>
                       <div className="item-left">
                         <div className="item-info">
                           <h3>{item.name}</h3>
-                          <p>消費期限：{item.expiry}</p>
+                          <p>消費期限：{item.date_expiration}</p>
                         </div>
                       </div>
                     </li>
@@ -122,10 +123,10 @@ function HomePage() {
                   <div className="item-left">
                     <div className="item-info">
                       <h3>{item.name}</h3>
-                      <p>消費期限：{item.expiry}</p>
+                      <p>消費期限：{item.date_expiration}</p>
                     </div>
                   </div>
-                  {getExpirationStatus(item.expiry)}
+                  {getExpirationStatus(item.date_expiration)}
                 </li>
               ))}
             </ul>
@@ -143,7 +144,7 @@ function HomePage() {
         }}
       >
         <strong>API ステータス (デバッグ):</strong>
-        {data ? <p>Response: {data.message}</p> : <p>Loading from API...</p>}
+        {data.length ? <p>Response: {JSON.stringify(data[0])}</p> : <p>Loading from API...</p>}
       </div>
       <Footer />
     </div>

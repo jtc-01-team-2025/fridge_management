@@ -1,10 +1,11 @@
 import { foodNames } from "../constants";
+import type { FoodType } from "../types/FoodType";
 
-interface InventoryItem {
-  name: string;
-  expiry: string;
-  isUrgent: boolean;
-}
+// interface InventoryItem {
+//   name: string;
+//   expiry: string;
+//   isUrgent: boolean;
+// }
 
 const randomFoodName = (): string => {
   return foodNames[Math.floor(Math.random() * foodNames.length)];
@@ -17,14 +18,17 @@ const randomExpiry = (): string => {
   return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 };
 
-const randomUrgent = (): boolean => {
-  return Math.random() < 0.5;
-};
+// const randomUrgent = (): boolean => {
+//   return Math.random() < 0.5;
+// };
 
-export const generateTestItems = (n: number): InventoryItem[] => {
+export const generateTestItems = (n: number): FoodType[] => {
   return Array.from({ length: n }).map(() => ({
+    itemID: n,
     name: randomFoodName(),
-    expiry: randomExpiry(),
-    isUrgent: randomUrgent(),
+    category: "",
+    date_expiration: randomExpiry(),
+    date_purchase: randomExpiry(),
+    // isUrgent: randomUrgent(),
   }));
 };
