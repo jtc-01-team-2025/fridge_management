@@ -269,7 +269,7 @@ function HomePage() {
           <button className="action-button secondary" onClick={() => navigate("/item/delete")}>
             食材の削除
           </button>
-          
+
         </div>
         <div className="item-list-panel">
           <h3>登録された食材のリスト (期限が迫ってくる順)</h3>
