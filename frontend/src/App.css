@@ -1,178 +1,107 @@
-#root {
-  max-width: 1280px;
-  height: 100%;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* --- フォーム関連のスタイル (ItemAddPageで使用) --- */
+
+.form-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 500px;
+    margin: 20px auto 0;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    text-align: left;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.form-group {
+    display: flex;
+    flex-direction: column;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 0.95em;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.form-panel input:not([type="checkbox"]),
+.form-panel select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    width: 100%; /* 親要素に合わせる */
+    box-sizing: border-box;
 }
 
-.card {
-  padding: 2em;
+/* 読み取り専用の項目 (登録番号) */
+.form-group.readonly {
+    background-color: #f7f7f7;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px dashed #ddd;
 }
 
-.read-the-docs {
-  color: #888;
+.form-group.readonly label {
+    color: #666;
+    font-size: 0.9em;
 }
 
-/* 基本的なリセット (全体) */
-body {
-  /* 既存の styles/index.css などで設定されている場合は省略可 */
-  font-family: "Inter", sans-serif;
-  background-color: #f8f8f8;
+.form-group .readonly-value {
+    font-weight: bold;
+    margin: 0;
+    padding-top: 5px;
+    color: #38c172; /* アクセントカラー */
 }
 
-/* root のセンタリングを解除し、ページ全体に適用 */
-#root {
-  max-width: none;
-  padding: 0;
-  margin: 0;
-  text-align: left; /* テキストアライメントをリセット */
-  min-height: 100vh;
+/* --- 削除・リスト表示関連のスタイル (ItemDeletePageで使用) --- */
+
+/* 削除ボタンのスタイル強調 */
+.action-button.delete {
+    background-color: #e3342f; /* 赤 */
+    color: white;
+    border-color: #e3342f;
 }
 
-/* ホーム画面のコンテナ */
-.home-container {
-  max-width: 1000px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 2px solid #38c172; /* 緑色の枠線 */
-  border-radius: 12px;
-  background-color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.action-button.delete:hover {
+    background-color: #c9302c;
+    border-color: #c9302c;
 }
 
-/* メインコンテンツ（リストとボタンを Flex で配置） */
-.main-content {
-  display: flex;
-  flex-wrap: wrap; /* 小さい画面では折り返す */
-  justify-content: space-between;
-  gap: 30px;
-  padding: 20px 0;
+/* 小さいボタン */
+.action-button.small {
+    padding: 5px 10px;
+    font-size: 0.85em;
+    border-width: 1px;
+    display: inline-block;
 }
 
-/* リストパネル (左側) */
-.item-list-panel {
-  border: 1px solid #38c172;
-  border-radius: 8px;
-  padding: 20px;
-  flex: 2; /* 広い幅を取る */
-  min-width: 300px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.item-list-panel h3 {
-  margin-top: 0;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  color: #38c172;
-}
-
-.item-list-panel ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.item-list-panel li {
-  padding: 8px 0;
-  font-size: 1.1em;
-  border-bottom: 1px dashed #f0f0f0;
-}
-
-/* 期限が迫っているアイテムのスタイル (赤文字) */
-.item-list-panel li.urgent {
-  color: #e3342f; /* 赤色 */
-  font-weight: 600;
-}
-
-.item-list-panel li .expiry-date {
-  font-weight: 400;
-  font-size: 0.9em;
-  margin-left: 5px;
-}
-
-/* 操作ボタンパネル (右側) */
-.action-buttons-panel {
-  flex: 1; /* 狭い幅を取る */
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* ボタン間のスペース */
-  min-width: 200px;
-}
-
-/* ボタンの共通スタイル */
-.action-button {
-  padding: 15px 10px;
-  border: 2px solid #38c172;
-  border-radius: 8px;
-  background-color: white;
-  font-size: 1em;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    transform 0.1s;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.action-button:hover {
-  background-color: #e6ffed; /* ホバー時の色 */
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* プライマリボタン (食材の登録へ) のスタイル強調 */
-.action-button.primary {
-  background-color: #38c172;
-  color: white;
-  font-weight: bold;
-}
-
-.action-button.primary:hover {
-  background-color: #2f9e61;
-}
-
-/* レスポンシブ対応 */
-@media (max-width: 768px) {
-  .main-content {
-    flex-direction: column; /* 画面が狭いときは縦に並べる */
-  }
-  .home-container {
-    margin: 20px;
-    padding: 15px;
-  }
-  .item-list-panel,
-  .action-buttons-panel {
-    flex: none;
+/* テーブルコンテナの調整 (スクロール対応) */
+.item-list-panel table {
+    /* テーブル全体は .item-list-panel の中にある */
     width: 100%;
-    min-width: auto;
-  }
+    border-collapse: collapse;
+    margin: 0;
+    table-layout: fixed; 
 }
+
+/* スクロールを可能にするために、親コンテナ(.item-list-panel)にmax-heightを設定済み */
+
+.inventory-table th,
+.inventory-table td {
+    padding: 12px;
+    border: 1px solid #eee; /* 薄い線に調整 */
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: white; /* 既存の .item-list-panel の背景色を継承 */
+}
+
+.inventory-table thead th {
+    background-color: #e6ffed; /* ヘッダーの背景色をアクセントに */
+    font-weight: bold;
+    color: #38c172;
+    /* スクロール時にヘッダーを固定するための設定 */
+    position: sticky;
