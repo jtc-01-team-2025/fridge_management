@@ -88,8 +88,6 @@
 // export default HomePage;
 
 
-
-
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { fetchData, type ApiResponse } from "../Client"; 

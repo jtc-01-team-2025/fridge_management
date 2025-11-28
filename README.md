@@ -107,3 +107,11 @@ podman-compose -f docker-compose.dev.yml up -d
 
 ## 備考
 - `__init__.py` は Python パッケージとして認識させるため必須。
+
+
+## DBコンテナ化手順
+### まずpodmanを起動
+podman machine start
+### podman composeを立ち上げる
+podman-compose up -d
+### 
