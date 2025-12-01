@@ -201,6 +201,31 @@ function HomePage() {
     return <span className={className}>{label}</span>;
   };
 
+  const getExpirationStatus = (expirationDate: string) => {
+    let label = "";
+    let className = "";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expire = new Date(expirationDate);
+    expire.setHours(0, 0, 0, 0);
+
+    const diffMs = expire.getTime() - today.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+    if (diffDays < 0) {
+      className = "badge expired";
+      label = "期限切れ";
+    } else if (diffDays <= 7) {
+      className = "badge warning";
+      label = "1週間以内";
+    } else {
+      className = "badge safe";
+      label = "安全";
+    }
+    return <span className={className}>{label}</span>;
+  };
+
   // 期限が近い食材のダミーデータ（実際のデータ取得ロジックは今後実装）
   // const items: InventoryItem[] = [
   //   { name: "リンゴ", expiry: "2025/10/1", isUrgent: true },
