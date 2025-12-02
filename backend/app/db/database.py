@@ -60,3 +60,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def init_db():
+    import app.db.models  # モデルをインポートして Base に登録
+    Base.metadata.create_all(bind=engine)

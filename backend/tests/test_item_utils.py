@@ -12,18 +12,18 @@ items = [Item(
     itemID=item.itemID,
     name=item.name,
     category=item.category,
-    date_purchase=item.date_purchase,
-    date_expiration=item.date_expiration
+    registered_on=item.registered_on,
+    expiry_date=item.expiry_date
 ) for item in db_items]
 
 # ここで各関数をテスト
 print("Expired items:")
 for i in expired_only(items):
-    print(i.itemID, i.name, i.date_expiration)
+    print(i.itemID, i.name, i.expiry_date)
 
 print("Valid items:")
 for i in filter_valid(items):
-    print(i.itemID, i.name, i.date_expiration)
+    print(i.itemID, i.name, i.expiry_date)
 
 print("Items grouped by category:")
 grouped = group_by_category(items)
@@ -32,4 +32,4 @@ for cat, lst in grouped.items():
 
 print("Expiring soon (next 4 days):")
 for i in expiring_soon(items, days=4):
-    print(i.itemID, i.name, i.date_expiration)
+    print(i.itemID, i.name, i.expiry_date)

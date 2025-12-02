@@ -17,14 +17,14 @@ if __name__ == "__main__":
         FridgeContents(
             name="バナナ",
             category="フルーツ",
-            date_purchase=datetime(2025, 11, 5),
-            date_expiration=datetime(2025, 11, 12)
+            registered_on =datetime(2025, 11, 5),
+            expiry_date=datetime(2025, 11, 12)
         ),
         FridgeContents(
             name="牛乳",
             category="乳製品",
-            date_purchase=datetime(2025, 11, 6),
-            date_expiration=datetime(2025, 11, 10)
+            registered_on=datetime(2025, 11, 6),
+            expiry_date=datetime(2025, 11, 10)
         )
     ]
 

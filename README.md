@@ -111,9 +111,53 @@ podman-compose -f docker-compose.dev.yml up -d
 - `__init__.py` は Python パッケージとして認識させるため必須。
 
 
-## DBコンテナ化手順
+## mysqlコンテナ化手順
 ### まずpodmanを起動
+```bash
 podman machine start
+```
 ### podman composeを立ち上げる
-podman-compose up -d
-### 
+```bash
+podman-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
+⬆️結果の末行は以下のはず：
+fridge-mysql
+fastapi-backend-dev
+react-frontend-dev
+これでコンテナ化できた
+### 動作確認
+・フロントエンド：http://localhost:5173
+・バックエンド：http://localhost:8000/docs
+・Mysql：
+    1.　接続確認
+    ```bash
+    podman exec -it fridge-mysql mysql -ufridge_user -pfridge_pass fridge_db
+    ```
+    ⬆️sql文を入力するプロンプトが表示されれば接続OK
+    
+    2.　次はmysqlのテーブルはできてるかを確認：
+    ```bash
+    show tables;
+    ```
+    ⬆️結果に以下が表示されればOK（fridge_contentsという名前のテーブル）
+    +---------------------+
+    | Tables_in_fridge_db |
+    +---------------------+
+    | fridge_contents     |
+    +---------------------+
+    1 row in set (0.00 sec)
+
+    3.　テーブルの中身を確認
+    ```bash
+    SELECT * FROM fridge_contents;
+    ```
+    ⬆️結果はemptyのはず（もしまだ何も実行してなければ）
+
+    4.　exitを入力して、enterキーを押したら退出
+### FastAPIを起動
+cdでバックエンドにフォルダーに移動
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+
