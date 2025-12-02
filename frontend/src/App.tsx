@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, type JSX } from "react";
 
 // --- 1. FoodType の定義 (API IDを使用) ---
 interface FoodType {
   // APIレスポンスで取得されるデータベースID
-  id: number; 
+  id: number;
   name: string;
   date_expiration: string; // YYYY-MM-DD 形式
 }
@@ -14,61 +14,76 @@ const API_BASE_URL = "http://localhost:8000";
 // ユーザーIDの永続化と取得
 // Docker Compose環境での開発のため、簡易的なセッションIDとしてLocalStorageを使用
 const getOrCreateUserId = (): string => {
-  let userId = localStorage.getItem('app_user_id');
+  let userId = localStorage.getItem("app_user_id");
   if (!userId) {
     userId = `user-${Math.random().toString(36).substring(2, 11)}`;
-    localStorage.setItem('app_user_id', userId);
+    localStorage.setItem("app_user_id", userId);
   }
   return userId;
 };
 
-
 // --- 3. ユーティリティコンポーネント ---
 
 const Footer = () => (
-    <footer className="w-full text-center p-4 mt-8 bg-gray-100 text-gray-600 text-sm border-t">
-        <p>© 2025 Refrigerator Manager App</p>
-    </footer>
+  <footer className="w-full text-center p-4 mt-8 bg-gray-100 text-gray-600 text-sm border-t">
+    <p>© 2025 Refrigerator Manager App</p>
+  </footer>
 );
 
-const Header = ({ navigate, currentPage }: { navigate: (path: Page) => void, currentPage: Page }) => (
-    <header className="w-full bg-indigo-700 shadow-lg sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto flex justify-between items-center p-4">
-            <h2 className="text-2xl font-bold text-white tracking-wider">Fridge Manager</h2>
-            <nav className="space-x-4">
-                <button 
-                    onClick={() => navigate("home")} 
-                    className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === 'home' ? 'border-b-2 border-white' : ''}`}
-                >
-                    ホーム
-                </button>
-                <button 
-                    onClick={() => navigate("add")} 
-                    className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === 'add' ? 'border-b-2 border-white' : ''}`}
-                >
-                    登録
-                </button>
-                <button 
-                    onClick={() => navigate("delete")} 
-                    className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === 'delete' ? 'border-b-2 border-white' : ''}`}
-                >
-                    削除
-                </button>
-            </nav>
-        </div>
-    </header>
+const Header = ({
+  navigate,
+  currentPage,
+}: {
+  navigate: (path: Page) => void;
+  currentPage: Page;
+}) => (
+  <header className="w-full bg-indigo-700 shadow-lg sticky top-0 z-40">
+    <div className="max-w-4xl mx-auto flex justify-between items-center p-4">
+      <h2 className="text-2xl font-bold text-white tracking-wider">Fridge Manager</h2>
+      <nav className="space-x-4">
+        <button
+          onClick={() => navigate("home")}
+          className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "home" ? "border-b-2 border-white" : ""}`}
+        >
+          ホーム
+        </button>
+        <button
+          onClick={() => navigate("add")}
+          className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "add" ? "border-b-2 border-white" : ""}`}
+        >
+          登録
+        </button>
+        <button
+          onClick={() => navigate("delete")}
+          className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "delete" ? "border-b-2 border-white" : ""}`}
+        >
+          削除
+        </button>
+      </nav>
+    </div>
+  </header>
 );
 
-const PopUp = ({ isVisible, onClose, children }: { isVisible: boolean, onClose: () => void, children: React.ReactNode }) => {
+const PopUp = ({
+  isVisible,
+  onClose,
+  children,
+}: {
+  isVisible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) => {
   if (!isVisible) return null;
 
-<<<<<<< HEAD
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all duration-300">
         <div className="flex justify-between items-start border-b pb-3 mb-4">
           <h2 className="text-xl font-semibold text-red-700">🚨 期限アラート</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-900 text-2xl leading-none">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-900 text-2xl leading-none"
+          >
             &times;
           </button>
         </div>
@@ -86,7 +101,7 @@ const PopUp = ({ isVisible, onClose, children }: { isVisible: boolean, onClose: 
   );
 };
 
-
+// const ExpirationStatus = (date: string) => {
 const ExpirationStatus = ({ date_expiration }: { date_expiration: string }) => {
   let label = "";
   let className = "py-1 px-3 rounded-full text-xs font-semibold whitespace-nowrap";
@@ -112,21 +127,22 @@ const ExpirationStatus = ({ date_expiration }: { date_expiration: string }) => {
   return <span className={className}>{label}</span>;
 };
 
-
 // --- 4. ItemDeletePage コンポーネント (API連携) ---
-const ItemDeletePage = ({ items, onBack, onDeleteItem }: { 
-  items: FoodType[]; 
-  onBack: () => void; 
-  onDeleteItem: (id: number) => Promise<void>; 
+const ItemDeletePage = ({
+  items,
+  onBack,
+  onDeleteItem,
+}: {
+  items: FoodType[];
+  onBack: () => void;
+  onDeleteItem: (id: number) => Promise<void>;
 }) => {
   // item.id を使用するように変更
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const toggleSelect = (id: number) => {
-    setSelectedItems(prev => 
-      prev.includes(id) 
-        ? prev.filter(itemId => itemId !== id)
-        : [...prev, id]
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
   };
 
@@ -135,21 +151,19 @@ const ItemDeletePage = ({ items, onBack, onDeleteItem }: {
       console.log("削除する食材が選択されていません。");
       return;
     }
-    
+
     // 削除処理の実行 (Promise.allで並列実行)
-    await Promise.all(selectedItems.map(id => onDeleteItem(id)));
-    
+    await Promise.all(selectedItems.map((id) => onDeleteItem(id)));
+
     setSelectedItems([]);
     onBack(); // 削除後にホームに戻る
   };
-  
+
   return (
     <div className="p-6 md:p-10 bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-auto">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-3">
-        🗑️ 食材の削除
-      </h1>
-      
-      <button 
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-3">🗑️ 食材の削除</h1>
+
+      <button
         onClick={onBack}
         className="mb-6 inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition duration-150"
       >
@@ -162,20 +176,26 @@ const ItemDeletePage = ({ items, onBack, onDeleteItem }: {
         ) : (
           <ul className="space-y-3">
             {items.map((item) => (
-              <li 
-                key={item.id} 
+              <li
+                key={item.id}
                 className={`flex justify-between items-center p-4 rounded-lg shadow-sm cursor-pointer transition duration-200 border-2 ${
-                  selectedItems.includes(item.id) 
-                    ? 'bg-red-100 border-red-500' 
-                    : 'bg-white border-gray-100 hover:bg-gray-50'
+                  selectedItems.includes(item.id)
+                    ? "bg-red-100 border-red-500"
+                    : "bg-white border-gray-100 hover:bg-gray-50"
                 }`}
                 onClick={() => toggleSelect(item.id)}
               >
                 <div className="flex items-center space-x-4">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
-                      selectedItems.includes(item.id) ? 'bg-red-500 border-red-500' : 'bg-white border-gray-400'
-                  }`}>
-                      {selectedItems.includes(item.id) && <span className="text-white text-xs font-bold">✓</span>}
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
+                      selectedItems.includes(item.id)
+                        ? "bg-red-500 border-red-500"
+                        : "bg-white border-gray-400"
+                    }`}
+                  >
+                    {selectedItems.includes(item.id) && (
+                      <span className="text-white text-xs font-bold">✓</span>
+                    )}
                   </div>
                   <div className="item-info">
                     <h4 className="text-lg font-semibold text-gray-900">{item.name}</h4>
@@ -194,9 +214,9 @@ const ItemDeletePage = ({ items, onBack, onDeleteItem }: {
           onClick={handleDelete}
           disabled={selectedItems.length === 0}
           className={`font-bold py-3 px-6 rounded-xl transition duration-150 shadow-lg ${
-            selectedItems.length > 0 
-              ? 'bg-red-600 hover:bg-red-700 text-white' 
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            selectedItems.length > 0
+              ? "bg-red-600 hover:bg-red-700 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
           選択した{selectedItems.length}件を削除
@@ -206,164 +226,195 @@ const ItemDeletePage = ({ items, onBack, onDeleteItem }: {
   );
 };
 
-
 // --- 5. ItemAddPage コンポーネント (API連携) ---
-const ItemAddPage = ({ onBack, onAddItem }: { onBack: () => void; onAddItem: (name: string, days: number) => Promise<void> }) => {
-    const [itemName, setItemName] = useState('');
-    const [days, setDays] = useState(7); // 期限を7日後に設定
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+const ItemAddPage = ({
+  onBack,
+  onAddItem,
+}: {
+  onBack: () => void;
+  onAddItem: (name: string, days: number) => Promise<void>;
+}) => {
+  const [itemName, setItemName] = useState("");
+  const [days, setDays] = useState(7); // 期限を7日後に設定
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (itemName.trim() && days > 0) {
-            setIsLoading(true);
-            setError(null);
-            try {
-                await onAddItem(itemName.trim(), days);
-                onBack();
-            } catch (err) {
-                console.error("登録エラー:", err);
-                setError("食材の登録中にエラーが発生しました。サーバーを確認してください。");
-            } finally {
-                setIsLoading(false);
-            }
-        } else {
-            setError("食材名を入力し、期限を1日以上で設定してください。");
-        }
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (itemName.trim() && days > 0) {
+      setIsLoading(true);
+      setError(null);
+      try {
+        await onAddItem(itemName.trim(), days);
+        onBack();
+      } catch (err) {
+        console.error("登録エラー:", err);
+        setError("食材の登録中にエラーが発生しました。サーバーを確認してください。");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setError("食材名を入力し、期限を1日以上で設定してください。");
+    }
+  };
 
-    return (
-        <div className="p-6 md:p-10 bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-3">
-                ➕ 食材の新規登録
-            </h1>
-            <button 
-                onClick={onBack}
-                className="mb-6 inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition duration-150"
-            >
-                &larr; ホームに戻る
-            </button>
-            
-            {error && <p className="text-red-600 bg-red-100 p-3 rounded-lg mb-4">{error}</p>}
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                    <label htmlFor="itemName" className="block text-sm font-medium text-gray-700">食材名</label>
-                    <input
-                        id="itemName"
-                        type="text"
-                        value={itemName}
-                        onChange={(e) => setItemName(e.target.value)}
-                        placeholder="例: 豆腐"
-                        required
-                        className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
-                        disabled={isLoading}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="days" className="block text-sm font-medium text-gray-700">期限 (今日から何日後)</label>
-                    <input
-                        id="days"
-                        type="number"
-                        value={days}
-                        onChange={(e) => setDays(parseInt(e.target.value) || 0)}
-                        min="1"
-                        required
-                        className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
-                        disabled={isLoading}
-                    />
-                </div>
-                
-                <button
-                    type="submit"
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg transform hover:scale-[1.01] flex items-center justify-center"
-                    disabled={isLoading || !itemName.trim() || days <= 0}
-                >
-                    {isLoading ? (
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    ) : (
-                        "登録"
-                    )}
-                </button>
-            </form>
+  return (
+    <div className="p-6 md:p-10 bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 border-b pb-3">
+        ➕ 食材の新規登録
+      </h1>
+      <button
+        onClick={onBack}
+        className="mb-6 inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition duration-150"
+      >
+        &larr; ホームに戻る
+      </button>
+
+      {error && <p className="text-red-600 bg-red-100 p-3 rounded-lg mb-4">{error}</p>}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="itemName" className="block text-sm font-medium text-gray-700">
+            食材名
+          </label>
+          <input
+            id="itemName"
+            type="text"
+            value={itemName}
+            onChange={(e) => setItemName(e.target.value)}
+            placeholder="例: 豆腐"
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading}
+          />
         </div>
-    );
-};
+        <div>
+          <label htmlFor="days" className="block text-sm font-medium text-gray-700">
+            期限 (今日から何日後)
+          </label>
+          <input
+            id="days"
+            type="number"
+            value={days}
+            onChange={(e) => setDays(parseInt(e.target.value) || 0)}
+            min="1"
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading}
+          />
+        </div>
 
+        <button
+          type="submit"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg transform hover:scale-[1.01] flex items-center justify-center"
+          disabled={isLoading || !itemName.trim() || days <= 0}
+        >
+          {isLoading ? (
+            <svg
+              className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          ) : (
+            "登録"
+          )}
+        </button>
+      </form>
+    </div>
+  );
+};
 
 // --- 6. HomePage コンポーネント ---
 
-const HomePage = ({ items, urgentItems, togglePopup, navigate, getStatusComponent, userId }: {
+const HomePage = ({
+  items,
+  urgentItems,
+  togglePopup,
+  navigate,
+  getStatusComponent,
+  userId,
+}: {
   items: FoodType[];
   urgentItems: FoodType[];
   togglePopup: () => void;
-  navigate: (path: 'home' | 'add' | 'delete') => void;
-  getStatusComponent: (date: string) => JSX.Element;
+  navigate: (path: "home" | "add" | "delete") => void;
+  getStatusComponent: ({ date_expiration }: { date_expiration: string }) => JSX.Element;
   userId: string;
 }) => (
   <div className="w-full max-w-4xl bg-white rounded-xl shadow-2xl p-6 md:p-10 mx-auto">
     <h1 className="text-3xl font-extrabold text-gray-900 mb-8 text-center border-b pb-3">
       🧊 冷蔵庫在庫管理ホーム
     </h1>
-    
+
     {/* ユーザーID表示 (FastAPIのX-User-Idヘッダーに使用) */}
     <div className="text-center mb-6 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
       <p className="text-sm font-medium text-indigo-700">現在のセッションID (API連携に使用):</p>
       <p className="font-mono text-xs text-gray-800 break-all">{userId}</p>
     </div>
-    
+
     <div className="flex flex-col md:flex-row gap-8">
-      
       {/* アクションボタンパネル */}
       <div className="md:w-1/3 flex flex-col space-y-4">
         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-2">アクション</h3>
-        
-        <button 
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg transform hover:scale-[1.02]" 
+
+        <button
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg transform hover:scale-[1.02]"
           onClick={() => navigate("add")}
         >
           ➕ 食材の登録
         </button>
 
         {/* 期限が近い、期限切れの食材 (ポップアップ表示) */}
-        <button 
+        <button
           className={`w-full font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg border-2 ${
-            urgentItems.length > 0 
-              ? 'bg-red-50 border-red-500 text-red-700 hover:bg-red-100 animate-pulse' 
-              : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
-          }`} 
+            urgentItems.length > 0
+              ? "bg-red-50 border-red-500 text-red-700 hover:bg-red-100 animate-pulse"
+              : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
+          }`}
           onClick={togglePopup}
         >
           ⚠️ 期限が近い食材 ({urgentItems.length}件)
         </button>
 
         {/* 食材の削除ボタン */}
-        <button 
-          className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md" 
+        <button
+          className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md"
           onClick={() => navigate("delete")}
         >
           🗑️ 食材の削除
         </button>
       </div>
-      
+
       {/* 登録された食材のリスト表示パネル */}
       <div className="md:w-2/3 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-inner">
         <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
           登録された食材リスト (期限が迫る順)
         </h3>
-        
+
         {items.length === 0 ? (
           <p className="text-gray-500 italic">まだ食材が登録されていません。</p>
         ) : (
           <ul className="space-y-3">
             {items.map((item) => (
-              <li 
+              <li
                 key={item.id} // APIから返されるIDをキーに使用
-                className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"> 
+                className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
+              >
                 <div className="flex items-center space-x-4">
                   <span className="text-lg text-gray-600">🍎</span> {/* アイコンは仮 */}
                   <div className="item-info">
@@ -371,46 +422,48 @@ const HomePage = ({ items, urgentItems, togglePopup, navigate, getStatusComponen
                     <p className="text-sm text-gray-500">消費期限：{item.date_expiration}</p>
                   </div>
                 </div>
-                {getStatusComponent(item.date_expiration)}
+                {getStatusComponent({date_expiration:item.date_expiration})}
               </li>
             ))}
           </ul>
         )}
       </div>
     </div>
-    
+
     {/* デバッグ情報 */}
     <div className="mt-10 p-4 bg-blue-50 text-blue-800 border border-blue-300 rounded-lg text-sm">
       <strong>💡 データ連携情報:</strong>
-      <p>アプリケーションは**FastAPIバックエンド** (`{API_BASE_URL}`) を介してMySQLデータベースと通信しています。</p>
+      <p>
+        アプリケーションは**FastAPIバックエンド** (`{API_BASE_URL}`)
+        を介してMySQLデータベースと通信しています。
+      </p>
       <p>データ件数: {items.length}件</p>
     </div>
   </div>
 );
 
-
 // --- 7. メインAppコンポーネント (APIロジックを統合) ---
 
-type Page = 'home' | 'delete' | 'add';
+type Page = "home" | "delete" | "add";
 
 export function App() {
   const [data, setData] = useState<FoodType[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [currentPage, setCurrentPage] = useState<Page>("home");
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // セッションIDの取得
   const userId = useMemo(() => getOrCreateUserId(), []);
 
   // --- API連携ロジック ---
-  
+
   // データの取得 (GET /items)
   const fetchItems = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/items`, {
         headers: {
-          'X-User-Id': userId, // FastAPIにユーザーIDを渡す
+          "X-User-Id": userId, // FastAPIにユーザーIDを渡す
         },
       });
 
@@ -428,9 +481,9 @@ export function App() {
     } catch (error) {
       console.error("Failed to fetch data from API:", error);
       // エラー時もロード状態を解除
-      setData([]); 
+      setData([]);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, [userId]);
 
@@ -439,110 +492,133 @@ export function App() {
     fetchItems();
   }, [fetchItems]);
 
-
   // 食材登録ロジック (POST /items)
-  const handleAddItem = useCallback(async (name: string, days: number): Promise<void> => {
-    const today = new Date();
-    // 期限日をYYYY-MM-DD形式で計算
-    const expiryDate = new Date(today.getTime() + days * 24 * 60 * 60 * 1000);
-    const dateString = expiryDate.toISOString().split('T')[0];
-    
-    const newItemData = {
+  const handleAddItem = useCallback(
+    async (name: string, days: number): Promise<void> => {
+      const today = new Date();
+      // 期限日をYYYY-MM-DD形式で計算
+      const expiryDate = new Date(today.getTime() + days * 24 * 60 * 60 * 1000);
+      const dateString = expiryDate.toISOString().split("T")[0];
+
+      const newItemData = {
         name: name,
-        date_expiration: dateString // FastAPIのPydanticモデルに合わせてフォーマット
-    };
-    
-    try {
+        date_expiration: dateString, // FastAPIのPydanticモデルに合わせてフォーマット
+      };
+
+      try {
         const response = await fetch(`${API_BASE_URL}/items`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-User-Id': userId,
-            },
-            body: JSON.stringify(newItemData)
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-Id": userId,
+          },
+          body: JSON.stringify(newItemData),
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         // 成功したらデータを再取得してリストを更新
         await fetchItems();
         console.log(`アイテム: ${name} がAPI経由で登録されました。`);
-    } catch (error) {
+      } catch (error) {
         console.error("Failed to add item via API:", error);
         throw error;
-    }
-  }, [userId, fetchItems]);
+      }
+    },
+    [userId, fetchItems]
+  );
 
   // 削除ロジック (DELETE /items/{item_id})
-  const handleDeleteItem = useCallback(async (id: number) => {
-    try {
+  const handleDeleteItem = useCallback(
+    async (id: number) => {
+      try {
         const response = await fetch(`${API_BASE_URL}/items/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-User-Id': userId,
-            },
+          method: "DELETE",
+          headers: {
+            "X-User-Id": userId,
+          },
         });
 
         if (response.status === 404) {
-             console.warn(`Item with ID ${id} already deleted or not found.`);
+          console.warn(`Item with ID ${id} already deleted or not found.`);
         } else if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         // 成功したらデータを再取得してリストを更新
         await fetchItems();
         console.log(`アイテム (ID: ${id}) がAPI経由で削除されました。`);
-
-    } catch (error) {
+      } catch (error) {
         console.error("Failed to delete item via API:", error);
         throw error; // エラーを上位に投げてItemDeletePageで処理させる
-    }
-  }, [userId, fetchItems]);
-  
-  // 期限が近い・期限切れアイテムのフィルタリング (変更なし)
-  const urgentItems = useMemo(() => 
-    data.filter((item) => {
-      const today = new Date();
-      const expiryDate = new Date(item.date_expiration);
-      expiryDate.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
-      
-      const diffDays =
-        (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-      
-      return diffDays <= 7; // 7日以内または期限切れ
-    }), [data]
+      }
+    },
+    [userId, fetchItems]
   );
-  
+
+  // 期限が近い・期限切れアイテムのフィルタリング (変更なし)
+  const urgentItems = useMemo(
+    () =>
+      data.filter((item) => {
+        const today = new Date();
+        const expiryDate = new Date(item.date_expiration);
+        expiryDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+
+        const diffDays = (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+
+        return diffDays <= 7; // 7日以内または期限切れ
+      }),
+    [data]
+  );
+
   // ページナビゲーションの代替 (変更なし)
   const navigate = (page: Page) => {
     setCurrentPage(page);
   };
 
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
-  
+
   // ページレンダリングの切り替え
   const renderPage = () => {
     // データロード中はローディング画面を表示
     if (isLoading) {
-        return (
-            <div className="text-center p-20 bg-white rounded-xl shadow-2xl">
-                <svg className="animate-spin h-8 w-8 text-indigo-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p className="text-gray-700 font-semibold">FastAPIサーバーからデータをロード中...</p>
-                <p className="text-sm text-gray-500 mt-2">（FastAPIコンテナが起動しているか確認してください: `http://localhost:8000/docs`）</p>
-            </div>
-        );
+      return (
+        <div className="text-center p-20 bg-white rounded-xl shadow-2xl">
+          <svg
+            className="animate-spin h-8 w-8 text-indigo-600 mx-auto mb-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className="text-gray-700 font-semibold">FastAPIサーバーからデータをロード中...</p>
+          <p className="text-sm text-gray-500 mt-2">
+            （FastAPIコンテナが起動しているか確認してください: `http://localhost:8000/docs`）
+          </p>
+        </div>
+      );
     }
 
     switch (currentPage) {
-      case 'home':
+      case "home":
         return (
-          <HomePage 
+          <HomePage
             items={data}
             urgentItems={urgentItems}
             togglePopup={togglePopup}
@@ -551,101 +627,96 @@ export function App() {
             userId={userId}
           />
         );
-      case 'delete':
+      case "delete":
         return (
           <ItemDeletePage
             items={data}
-            onBack={() => setCurrentPage('home')}
+            onBack={() => setCurrentPage("home")}
             onDeleteItem={handleDeleteItem}
           />
         );
-      case 'add':
-        return (
-            <ItemAddPage
-                onBack={() => setCurrentPage('home')}
-                onAddItem={handleAddItem}
-            />
-        );
+      case "add":
+        return <ItemAddPage onBack={() => setCurrentPage("home")} onAddItem={handleAddItem} />;
       default:
-        return <HomePage 
+        return (
+          <HomePage
             items={data}
             urgentItems={urgentItems}
             togglePopup={togglePopup}
             navigate={navigate}
             getStatusComponent={ExpirationStatus}
             userId={userId}
-        />;
+          />
+        );
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col p-0 font-sans">
       <Header navigate={navigate} currentPage={currentPage} />
-      
-      <main className="flex-grow p-4 md:p-8">
-        {renderPage()}
-      </main>
+
+      <main className="flex-grow p-4 md:p-8">{renderPage()}</main>
 
       <PopUp isVisible={isPopupVisible} onClose={togglePopup}>
         <div className="space-y-4">
           {urgentItems.length === 0 ? (
-            <p className="text-gray-600">期限が近い、または期限切れの食材はありません。素晴らしい！</p>
+            <p className="text-gray-600">
+              期限が近い、または期限切れの食材はありません。素晴らしい！
+            </p>
           ) : (
             <>
               <h3 className="text-lg font-bold text-red-600">期限が近い、期限切れの食材一覧</h3>
               <ul className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                {urgentItems
-                  .map((item) => (
-                    <li key={item.id} className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-200"> 
-                      <div className="flex-grow">
-                        <h4 className="font-medium text-gray-800">{item.name}</h4>
-                        <p className="text-sm text-gray-500">消費期限：{item.date_expiration}</p>
-                      </div>
-                      <ExpirationStatus date_expiration={item.date_expiration} />
-                    </li>
-                  ))}
+                {urgentItems.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-200"
+                  >
+                    <div className="flex-grow">
+                      <h4 className="font-medium text-gray-800">{item.name}</h4>
+                      <p className="text-sm text-gray-500">消費期限：{item.date_expiration}</p>
+                    </div>
+                    <ExpirationStatus date_expiration={item.date_expiration} />
+                  </li>
+                ))}
               </ul>
             </>
           )}
         </div>
       </PopUp>
-      
+
       <Footer />
     </div>
   );
 }
 
-export default App;
-=======
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage'; 
-import ItemAddPage from './pages/ItemAddPage';       
-import ItemDeletePage from './pages/ItemDeletePage'; 
-import { useEffect } from "react";
+// export default App;
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// import HomePage from './pages/HomePage';
+// import ItemAddPage from './pages/ItemAddPage';
+// import ItemDeletePage from './pages/ItemDeletePage';
+// import { useEffect } from "react";
 
-function App() {
-  useEffect(() => {
-    fetch("http://localhost:8000/ping")
-      .then((res) => res.json())
-      .then((data) => console.log("バックエンドからの応答:", data))
-      .catch((err) => console.error("接続エラー:", err));
-  }, []);
+// function App() {
+//   useEffect(() => {
+//     fetch("http://localhost:8000/ping")
+//       .then((res) => res.json())
+//       .then((data) => console.log("バックエンドからの応答:", data))
+//       .catch((err) => console.error("接続エラー:", err));
+//   }, []);
 
-  return (
-    
-    <div>
-      <h1>冷蔵庫管理アプリ</h1>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/item/add" element={<ItemAddPage />} />     
-        <Route path="/item/delete" element={<ItemDeletePage />} /> 
-      </Routes>
-    </div>
-    
-  );
-}
+//   return (
 
-export default App;
+//     <div>
+//       <h1>冷蔵庫管理アプリ</h1>
+//       <Routes>
+//         <Route path="/" element={<HomePage />} />
+//         <Route path="/item/add" element={<ItemAddPage />} />
+//         <Route path="/item/delete" element={<ItemDeletePage />} />
+//       </Routes>
+//     </div>
 
+//   );
+// }
 
->>>>>>> 3161625f9f6c0aaf278405a3c3e4c60e7564a0cf
+// export default App;

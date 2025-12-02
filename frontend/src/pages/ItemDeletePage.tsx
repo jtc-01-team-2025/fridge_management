@@ -26,7 +26,7 @@ interface ModalState {
 // ===========================================
 
 // 実際にはバックエンドのFastAPIエンドポイントを呼び出します
-const API_BASE_URL = 'http://localhost:8000/api/items';
+// const API_BASE_URL = 'http://localhost:8000/api/items';
 
 const fetchItems = async (): Promise<FridgeItem[]> => {
   // TODO: 実際のAPI呼び出しに置き換える
