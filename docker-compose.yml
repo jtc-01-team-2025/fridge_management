@@ -3,6 +3,17 @@ version: "3.9"
 
 
 services:
+
+  frontend:
+    build: ./frontend
+    container_name: react-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
   backend:
     build: ./backend
     container_name: fastapi-backend
@@ -14,12 +25,18 @@ services:
       - PYTHONUNBUFFERED=1
     depends_on:
       - db
-
-  frontend:
-    build: ./frontend
-    container_name: react-frontend
-    depends_on:
-      - backend
+  db:
+    image: mysql:8.0
+    container_name: fridge-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fridge_db
+      MYSQL_USER: fridge_user
+      MYSQL_PASSWORD: fridge_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
 
 # top-level でボリューム定義
 volumes:
