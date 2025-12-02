@@ -59,21 +59,32 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage'; 
-import ItemAddPage from './pages/ItemAddPage';       // 食材登録ページ
-import ItemDeletePage from './pages/ItemDeletePage'; // 食材削除ページ
+import ItemAddPage from './pages/ItemAddPage';       
+import ItemDeletePage from './pages/ItemDeletePage'; 
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    fetch("http://localhost:8000/ping")
+      .then((res) => res.json())
+      .then((data) => console.log("バックエンドからの応答:", data))
+      .catch((err) => console.error("接続エラー:", err));
+  }, []);
+
   return (
-    <Router>
+    
+    <div>
+      <h1>冷蔵庫管理アプリ</h1>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        {/* InventoryListPage へのルートを削除 */}
         <Route path="/item/add" element={<ItemAddPage />} />     
         <Route path="/item/delete" element={<ItemDeletePage />} /> 
       </Routes>
-    </Router>
+    </div>
+    
   );
 }
 
 export default App;
+
 

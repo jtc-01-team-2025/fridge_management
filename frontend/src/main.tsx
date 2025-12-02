@@ -14,6 +14,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom'; // 👈 BrowserRouterをインポート
 import App from './App.tsx';
 import './index.css';
+import { API_BASE_URL } from './Client';
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
