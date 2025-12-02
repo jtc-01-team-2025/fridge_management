@@ -72,6 +72,14 @@ const ExpirationStatus = ({ date_expiration }: { date_expiration: string }) => {
   let className = "py-1 px-3 rounded-full text-xs font-semibold whitespace-nowrap";
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+// import { useEffect, useState } from "react";
+// import { useNavigate } from 'react-router-dom';
+// import { fetchData, type ApiResponse } from "../Client"; 
+// import '../App.css'; 
+// import { useMemo } from 'react';
+// import { generateTestItems } from '../utils/generateDummyData';
+
+
 
   const expire = new Date(date_expiration);
   expire.setHours(0, 0, 0, 0);
@@ -423,6 +431,9 @@ export function App() {
     }
     setCurrentPage(page);
   };
+  // //useMemo() を使って items をメモ化
+  // const items = useMemo(() => generateTestItems(Math.floor(Math.random() * 11)), []);
+  // const [isPopupVisible, setIsPopupVisible] = useState(false);
 
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
   
@@ -502,3 +513,38 @@ export function App() {
 }
 
 export default App;
+
+// function PopUp({
+//   isVisible,
+//   onClose,
+//   children,
+// }: {
+//   isVisible: boolean;
+//   onClose: () => void;
+//   children: React.ReactNode;
+// }) {
+//   if (!isVisible) return null;
+
+//   return (
+//     <div className="popup-overlay">
+//       <div className="popup-content">
+//         <button className="close-button" onClick={onClose}>
+//           ✕
+//         </button>
+//         {children}
+//       </div>
+//     </div>
+//   );
+// }
+
+
+// function Footer() {
+//   return (
+//     <footer style={{ marginTop: "2rem", textAlign: "center", color: "#888" }}>
+//       © 2025 Fridge Management App
+//     </footer>
+//   );
+// }
+
+
+// export default HomePage;

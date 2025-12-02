@@ -62,6 +62,7 @@ const Header = ({ navigate, currentPage }: { navigate: (path: Page) => void, cur
 const PopUp = ({ isVisible, onClose, children }: { isVisible: boolean, onClose: () => void, children: React.ReactNode }) => {
   if (!isVisible) return null;
 
+<<<<<<< HEAD
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all duration-300">
@@ -615,3 +616,36 @@ export function App() {
 }
 
 export default App;
+=======
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage'; 
+import ItemAddPage from './pages/ItemAddPage';       
+import ItemDeletePage from './pages/ItemDeletePage'; 
+import { useEffect } from "react";
+
+function App() {
+  useEffect(() => {
+    fetch("http://localhost:8000/ping")
+      .then((res) => res.json())
+      .then((data) => console.log("バックエンドからの応答:", data))
+      .catch((err) => console.error("接続エラー:", err));
+  }, []);
+
+  return (
+    
+    <div>
+      <h1>冷蔵庫管理アプリ</h1>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/item/add" element={<ItemAddPage />} />     
+        <Route path="/item/delete" element={<ItemDeletePage />} /> 
+      </Routes>
+    </div>
+    
+  );
+}
+
+export default App;
+
+
+>>>>>>> 3161625f9f6c0aaf278405a3c3e4c60e7564a0cf

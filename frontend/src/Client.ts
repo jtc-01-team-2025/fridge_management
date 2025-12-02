@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 // src/Client.ts
 import type { FoodType } from "./types/FoodType";
+=======
+//const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
+>>>>>>> 3161625f9f6c0aaf278405a3c3e4c60e7564a0cf
 
 // 環境変数からAPIのベースURLを取得。取得できない場合はローカル環境のデフォルトURLを使用。
 // 例: "http://127.0.0.1:8000"
