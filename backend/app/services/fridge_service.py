@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from app.db import models
 
-from app.db.database import session
+from app.db.database import get_db
 from app.api.schemas import ItemCreate
 from sqlalchemy.orm import Session
 from app.db.models import FridgeContents

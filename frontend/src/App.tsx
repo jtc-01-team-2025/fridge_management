@@ -9,7 +9,7 @@ interface FoodType {
 }
 
 // --- 2. API設定 ---
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://localhost:8000/api";
 
 // ユーザーIDの永続化と取得
 // Docker Compose環境での開発のため、簡易的なセッションIDとしてLocalStorageを使用

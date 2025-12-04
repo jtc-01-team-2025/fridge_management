@@ -7,9 +7,9 @@ from typing import List
 class FridgeContentsBase(BaseModel):
     name: str
     category: str
-    registered_on: date
-    expiry_date: date
-    quantity: int
+    date_purchase: date
+    date_expiration: date
+    # quantity: int
 
     class Config:
         from_attributes = True
@@ -17,17 +17,17 @@ class FridgeContentsBase(BaseModel):
 class ItemCreate(BaseModel):
     name: str
     category: str
-    registered_on: date
-    expiry_date: date
-    quantity: int
+    date_purchase: date
+    date_expiration: date
+    # quantity: int
 
 class Item(BaseModel):
     itemID: int
     name: str
     category: str
-    registered_on: date
-    expiry_date: date
-    quantity: int
+    date_purchase: date
+    date_expiration: date
+    # quantity: int
 
     model_config = {
         "from_attributes": True
@@ -37,9 +37,9 @@ class ItemResponse(BaseModel):
     itemID: int
     name: str
     category: str
-    registered_on: date
-    expiry_date: date
-    quantity: int
+    date_purchase: date
+    date_expiration: date
+    # quantity: int
 
     class Config:
         from_attributes = True

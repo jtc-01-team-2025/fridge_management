@@ -53,6 +53,7 @@ podman machine start
 3. コンテナ群を起動
 ```bash
 podman-compose up -d
+podman-compose up -d --build   
 ```
 
 3.1 開発環境の場合（ホットリロード機能）
@@ -159,5 +160,7 @@ cdでバックエンドにフォルダーに移動
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
+
+pip list
 
 

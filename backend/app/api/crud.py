@@ -8,8 +8,8 @@ def create_item(db: Session, item: schemas.FridgeContentsCreate):
     db_item = models.FridgeContents(
         name=item.name,
         category=item.category,
-        registered_on=item.registered_on,  
-        expiry_date=item.expiry_date
+        date_purchase=item.date_purchase,  
+        date_expiration=item.date_expiration
     )
 
     #入力されたデータをテーブルに格納
@@ -21,7 +21,9 @@ def create_item(db: Session, item: schemas.FridgeContentsCreate):
 
 #テーブルからデータの一覧を取得
 def get_items_sorted(db: Session):
-    return db.query(models.FridgeContents).order_by(models.FridgeContents.expiry_date).all()
+    items = db.query(models.FridgeContents).order_by(models.FridgeContents.date_expiration).all()
+    print("取得したデータ:", items)
+    return items
 
 #削除処理機能
 def delete_item(db: Session, item_id: int):

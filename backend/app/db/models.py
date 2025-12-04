@@ -9,7 +9,6 @@ class FridgeContents(Base):
     itemID = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
     category = Column(String(50), nullable=False)
-    registered_on = Column(Date, nullable=False)
-    expiry_date = Column(Date, nullable=False)
-    quantity = Column(Integer, nullable=False)
-
+    date_purchase = Column(Date, nullable=False)
+    date_expiration = Column(Date, nullable=False)
+    # quantity = Column(Integer, nullable=False)
