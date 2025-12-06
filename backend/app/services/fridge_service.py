@@ -13,9 +13,8 @@ def create_item(data: ItemCreate, db: Session):
     new_item = models.FridgeContents(
         name=data.name,
         category=data.category,
-        registered_on=data.registered_on,
-        expiry_date=data.expiry_date,
-        quantity=data.quantity
+        date_purchase=data.date_purchase,
+        date_expiration=data.date_expiration,
     )
     db.add(new_item)
     db.commit()

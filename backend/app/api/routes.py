@@ -4,7 +4,7 @@ from app.api import crud, schemas
 from app.db.database import get_db #DBセッション提供関数の取り込み: Depends(get_db)で、リクエストごとにDBセッションを用意してもらうために使う
 from app.services import fridge_service
 from app.api.schemas import FridgeContentsCreate, ItemCreate
-
+from typing import Optional
 
 router = APIRouter()
 

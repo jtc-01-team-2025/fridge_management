@@ -1,13 +1,12 @@
 from pydantic import BaseModel
 from datetime import date
-
-from typing import List
+from typing import Optional, List
 
 
 class FridgeContentsBase(BaseModel):
     name: str
-    category: str
-    date_purchase: date
+    category: str = ""
+    date_purchase: Optional[date] = None
     date_expiration: date
     # quantity: int
 
@@ -16,8 +15,8 @@ class FridgeContentsBase(BaseModel):
 
 class ItemCreate(BaseModel):
     name: str
-    category: str
-    date_purchase: date
+    category: str = ""
+    date_purchase: Optional[date] = None
     date_expiration: date
     # quantity: int
 
@@ -36,8 +35,8 @@ class Item(BaseModel):
 class ItemResponse(BaseModel):
     itemID: int
     name: str
-    category: str
-    date_purchase: date
+    category: str = ""
+    date_purchase: Optional[date] = None
     date_expiration: date
     # quantity: int
 
