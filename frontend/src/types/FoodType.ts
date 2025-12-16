@@ -1,3 +1,10 @@
+
+export interface FoodTypeNew {
+  // APIレスポンスで取得されるデータベースID
+  id: number;
+  name: string;
+  date_expiration: string; // YYYY-MM-DD 形式
+}
 export interface FoodType {
   itemID: number; // アイテムの一意の識別子
   name: string; // アイテム名
