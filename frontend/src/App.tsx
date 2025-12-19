@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState, useCallback} from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 // import type { FoodType } from "./types/FoodType";
 import { ItemAddPage } from "./pages/ItemAddPage";
 import { ExpirationStatus } from "./components/Expiration";
 import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
 import type { FoodTypeNew } from "./types/FoodType";
+import PopUp from "./components/PopUP";
+import { generateTestItems } from "./utils/generateDummyData";
 
 // --- 2. API設定 ---
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 // ユーザーIDの永続化と取得
 // Docker Compose環境での開発のため、簡易的なセッションIDとしてLocalStorageを使用
@@ -62,42 +64,42 @@ const Header = ({
   </header>
 );
 
-const PopUp = ({
-  isVisible,
-  onClose,
-  children,
-}: {
-  isVisible: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}) => {
-  if (!isVisible) return null;
+// const PopUp = ({
+//   isVisible,
+//   onClose,
+//   children,
+// }: {
+//   isVisible: boolean;
+//   onClose: () => void;
+//   children: React.ReactNode;
+// }) => {
+//   if (!isVisible) return null;
 
-  return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all duration-300">
-        <div className="flex justify-between items-start border-b pb-3 mb-4">
-          <h2 className="text-xl font-semibold text-red-700">🚨 期限アラート</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-900 text-2xl leading-none"
-          >
-            &times;
-          </button>
-        </div>
-        {children}
-        <div className="mt-6 pt-4 border-t flex justify-end">
-          <button
-            onClick={onClose}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl transition duration-150 shadow-md"
-          >
-            閉じる
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
+//       <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform transition-all duration-300">
+//         <div className="flex justify-between items-start border-b pb-3 mb-4">
+//           <h2 className="text-xl font-semibold text-red-700">🚨 期限アラート</h2>
+//           <button
+//             onClick={onClose}
+//             className="text-gray-500 hover:text-gray-900 text-2xl leading-none"
+//           >
+//             &times;
+//           </button>
+//         </div>
+//         {children}
+//         <div className="mt-6 pt-4 border-t flex justify-end">
+//           <button
+//             onClick={onClose}
+//             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl transition duration-150 shadow-md"
+//           >
+//             閉じる
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 // const ExpirationStatus = (date: string) => {
 
@@ -110,33 +112,37 @@ export function App() {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [isLoading, setIsLoading] = useState(true);
-
+  // API使用フラグ
+  const useApiFlag = import.meta.env.VITE_USE_API === "true";
   // セッションIDの取得
   const userId = useMemo(() => getOrCreateUserId(), []);
-
-  // --- API連携ロジック ---
 
   // データの取得 (GET /items)
   const fetchItems = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/items`, {
-        headers: {
-          "X-User-Id": userId, // FastAPIにユーザーIDを渡す
-        },
-      });
+      if (useApiFlag) {
+        const response = await fetch(`${API_BASE_URL}/items`, {
+          headers: {
+            "X-User-Id": userId, // FastAPIにユーザーIDを渡す
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const items: FoodTypeNew[] = await response.json();
+        // API側でソートされているはずだが、念のためクライアント側でもソート
+        const sortedItems = items.sort(
+          (a, b) => new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime()
+        );
+        setData(sortedItems);
+        console.log("Data fetched successfully:", sortedItems.length);
+      } else {
+        const items = generateTestItems(Math.floor(Math.random() * 11));
+        setData(items);
       }
-
-      const items: FoodTypeNew[] = await response.json();
-      // API側でソートされているはずだが、念のためクライアント側でもソート
-      const sortedItems = items.sort(
-        (a, b) => new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime()
-      );
-      setData(sortedItems);
-      console.log("Data fetched successfully:", sortedItems.length);
     } catch (error) {
       console.error("Failed to fetch data from API:", error);
       // エラー時もロード状態を解除

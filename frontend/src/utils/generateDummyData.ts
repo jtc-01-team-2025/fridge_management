@@ -1,5 +1,5 @@
 import { foodNames } from "../constants";
-import type { FoodType } from "../types/FoodType";
+import type { FoodTypeNew } from "../types/FoodType";
 
 // interface InventoryItem {
 //   name: string;
@@ -22,13 +22,22 @@ const randomExpiry = (): string => {
 //   return Math.random() < 0.5;
 // };
 
-export const generateTestItems = (n: number): FoodType[] => {
+// export const generateTestItems = (n: number): FoodType[] => {
+//   return Array.from({ length: n }).map(() => ({
+//     itemID: n,
+//     name: randomFoodName(),
+//     category: "",
+//     date_expiration: randomExpiry(),
+//     date_purchase: randomExpiry(),
+//     // isUrgent: randomUrgent(),
+//   }));
+// };
+
+// 12/19 一旦この機能にする
+export const generateTestItems = (n: number): FoodTypeNew[] => {
   return Array.from({ length: n }).map(() => ({
-    itemID: n,
+    id: n,
     name: randomFoodName(),
-    category: "",
     date_expiration: randomExpiry(),
-    date_purchase: randomExpiry(),
-    // isUrgent: randomUrgent(),
   }));
 };
