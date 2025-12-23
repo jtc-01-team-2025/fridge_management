@@ -119,16 +119,64 @@ podman machine start
 ```
 ### podman composeを立ち上げる
 ```bash
-podman-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+podman-compose -f docker-compose.yml up -d
 ```
 ⬆️結果の末行は以下のはず：
 fridge-mysql
 fastapi-backend-dev
 react-frontend-dev
 これでコンテナ化できた
+  ####　もしここで「proxy already running」エラーが発生したら、以下の手順で解消してください：
+  １、podmanを停止
+  ```bash
+  podman machine stop
+  ```
+  ２、proxyのプロセスを探し、PIDを確定
+  ```bash
+  ps aux | grep gvproxy
+  ```
+  ３、proxyのプロセスを削除
+  ```bash
+  pkill -9 "ここはproxyのPID"
+  ```
+  ４、再度podmanを起動
+  ```bash
+  podman machine start
+  ```
+  ５、ネットワークを作り直す
+  ```bash
+  podman network prune -f
+  ```
+  ６、残骸を一掃
+  ```bash
+  podman rm -f $(podman ps -aq)
+  ```
+  もし上記の実行でエラーが発生したら、二、三回同じコマンドを実行することで、親子コンテナを全部消す
+  ７、ちゃんと全て消したかを確認
+  ```bash
+  podman ps -a
+  ```
+  ⬆️結果は何もないはず
+  ８、ここでもう一回コンテナ作ります
+  ```bash
+  podman-compose -f docker-compose.yml up -d
+  ```
+  あるいは
+  ```bash
+  podman-compose up -d --build
+  ```
+
 ### 動作確認
 ・フロントエンド：http://localhost:5173
 ・バックエンド：http://localhost:8000/docs
+  ####　もしここで失敗したら、ログで原因を調べる
+  ```bash
+  podman logs fridge-mysql
+  ```
+  あるいは　
+  ```bash
+  podman logs fastapi-backend
+  ```
 ・Mysql：
     1.　接続確認
     ```bash
