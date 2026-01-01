@@ -4,9 +4,11 @@ import { ItemAddPage } from "./pages/ItemAddPage";
 import { ExpirationStatus } from "./components/Expiration";
 import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
-import type { FoodTypeNew } from "./types/FoodType";
+import type { FoodTypeNew, Page } from "./types/FoodType";
 import PopUp from "./components/PopUP";
 import { generateTestItems } from "./utils/generateDummyData";
+import "./styles/Homepage.css";
+import Header from "./components/Header";
 
 // --- 2. API設定 ---
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -30,39 +32,39 @@ const Footer = () => (
   </footer>
 );
 
-const Header = ({
-  navigate,
-  currentPage,
-}: {
-  navigate: (path: Page) => void;
-  currentPage: Page;
-}) => (
-  <header className="w-full bg-indigo-700 shadow-lg sticky top-0 z-40">
-    <div className="max-w-4xl mx-auto flex justify-between items-center p-4">
-      <h2 className="text-2xl font-bold text-white tracking-wider">Fridge Manager</h2>
-      <nav className="space-x-4">
-        <button
-          onClick={() => navigate("home")}
-          className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "home" ? "border-b-2 border-white" : ""}`}
-        >
-          ホーム
-        </button>
-        <button
-          onClick={() => navigate("add")}
-          className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "add" ? "border-b-2 border-white" : ""}`}
-        >
-          登録
-        </button>
-        <button
-          onClick={() => navigate("delete")}
-          className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "delete" ? "border-b-2 border-white" : ""}`}
-        >
-          削除
-        </button>
-      </nav>
-    </div>
-  </header>
-);
+// const Header = ({
+//   navigate,
+//   currentPage,
+// }: {
+//   navigate: (path: Page) => void;
+//   currentPage: Page;
+// }) => (
+//   <header className="w-full bg-indigo-700 shadow-lg sticky top-0 z-40">
+//     <div className="max-w-4xl mx-auto flex justify-between items-center p-4">
+//       <h2 className="text-2xl font-bold text-white tracking-wider">Fridge Manager</h2>
+//       <nav className="space-x-4">
+//         <button
+//           onClick={() => navigate("home")}
+//           className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "home" ? "border-b-2 border-white" : ""}`}
+//         >
+//           ホーム
+//         </button>
+//         <button
+//           onClick={() => navigate("add")}
+//           className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "add" ? "border-b-2 border-white" : ""}`}
+//         >
+//           登録
+//         </button>
+//         <button
+//           onClick={() => navigate("delete")}
+//           className={`text-white font-medium transition duration-150 hover:text-indigo-200 ${currentPage === "delete" ? "border-b-2 border-white" : ""}`}
+//         >
+//           削除
+//         </button>
+//       </nav>
+//     </div>
+//   </header>
+// );
 
 // const PopUp = ({
 //   isVisible,
@@ -104,8 +106,6 @@ const Header = ({
 // const ExpirationStatus = (date: string) => {
 
 // --- 7. メインAppコンポーネント (APIロジックを統合) ---
-
-type Page = "home" | "delete" | "add";
 
 export function App() {
   const [data, setData] = useState<FoodTypeNew[]>([]);
@@ -318,7 +318,7 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col p-0 font-sans">
-      <Header navigate={navigate} currentPage={currentPage} />
+      <Header navigate={navigate} />
 
       <main className="flex-grow p-4 md:p-8">{renderPage()}</main>
 

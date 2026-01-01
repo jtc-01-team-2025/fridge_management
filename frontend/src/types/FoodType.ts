@@ -1,4 +1,3 @@
-
 export interface FoodTypeNew {
   // APIレスポンスで取得されるデータベースID
   id: number;
@@ -12,3 +11,5 @@ export interface FoodType {
   date_purchase: string; // 購入日 (ISO 8601形式: YYYY-MM-DD)
   date_expiration: string; // 消費期限 (ISO 8601形式: YYYY-MM-DD)
 }
+
+export type Page = "home" | "delete" | "add";
