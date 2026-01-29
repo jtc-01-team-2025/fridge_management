@@ -3,7 +3,7 @@
 
 import type { JSX } from "react";
 import type { FoodTypeNew } from "../types/FoodType";
-
+import "../styles/Homepage.css";
 // // --- 1. FoodType の定義 ---
 // interface FoodType {
 //   id: number;
@@ -617,28 +617,24 @@ import type { FoodTypeNew } from "../types/FoodType";
 
 // // export default HomePage;
 // --- 2. API設定 ---
-const API_BASE_URL = "http://localhost:8000/api";
+// const API_BASE_URL = "http://localhost:8000/api";
 
 // --- 6. HomePage コンポーネント ---
 export const HomePage = ({
   items,
-  urgentItems,
   togglePopup,
   navigate,
   getStatusComponent,
   userId,
 }: {
   items: FoodTypeNew[];
-  urgentItems: FoodTypeNew[];
   togglePopup: () => void;
   navigate: (path: "home" | "add" | "delete") => void;
   getStatusComponent: ({ date_expiration }: { date_expiration: string }) => JSX.Element;
   userId: string;
 }) => (
-  <div className="w-full max-w-4xl bg-white rounded-xl shadow-2xl p-6 md:p-10 mx-auto">
-    <h1 className="text-3xl font-extrabold text-gray-900 mb-8 text-center border-b pb-3">
-      🧊 冷蔵庫在庫管理ホーム
-    </h1>
+  <div className="home-container">
+    <h2>冷蔵庫管理</h2>
 
     {/* ユーザーID表示 (FastAPIのX-User-Idヘッダーに使用) */}
     <div className="text-center mb-6 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
@@ -646,41 +642,21 @@ export const HomePage = ({
       <p className="font-mono text-xs text-gray-800 break-all">{userId}</p>
     </div>
 
-    <div className="flex flex-col md:flex-row gap-8">
-      {/* アクションボタンパネル */}
-      <div className="md:w-1/3 flex flex-col space-y-4">
-        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-2">アクション</h3>
-
-        <button
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg transform hover:scale-[1.02]"
-          onClick={() => navigate("add")}
-        >
-          ➕ 食材の登録
+    <div className="main-content">
+      <div className="action-buttons-panel">
+        <button className="action-button secondary" onClick={() => navigate("add")}>
+          食材の登録
         </button>
-
-        {/* 期限が近い、期限切れの食材 (ポップアップ表示) */}
-        <button
-          className={`w-full font-bold py-3 px-4 rounded-xl transition duration-150 shadow-lg border-2 ${
-            urgentItems.length > 0
-              ? "bg-red-50 border-red-500 text-red-700 hover:bg-red-100 animate-pulse"
-              : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
-          }`}
-          onClick={togglePopup}
-        >
-          ⚠️ 期限が近い食材 ({urgentItems.length}件)
+        <button className="action-button secondary" onClick={togglePopup}>
+          期限が近い/切れ食材
         </button>
-
-        {/* 食材の削除ボタン */}
-        <button
-          className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md"
-          onClick={() => navigate("delete")}
-        >
-          🗑️ 食材の削除
+        <button className="action-button secondary" onClick={() => navigate("delete")}>
+          食材の削除
         </button>
       </div>
 
       {/* 登録された食材のリスト表示パネル */}
-      <div className="md:w-2/3 bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-inner">
+      <div className="item-list-panel">
         <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
           登録された食材リスト (期限が迫る順)
         </h3>
@@ -688,20 +664,16 @@ export const HomePage = ({
         {items.length === 0 ? (
           <p className="text-gray-500 italic">まだ食材が登録されていません。</p>
         ) : (
-          <ul className="space-y-3">
+          <ul>
             {items.map((item) => (
-              <li
-                key={item.id} // APIから返されるIDをキーに使用
-                className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition duration-200 border border-gray-100"
-              >
-                <div className="flex items-center space-x-4">
-                  <span className="text-lg text-gray-600">🍎</span> {/* アイコンは仮 */}
+              <li key={item.id}>
+                <div className="item-left">
                   <div className="item-info">
                     <h4 className="text-lg font-semibold text-gray-900">{item.name}</h4>
                     <p className="text-sm text-gray-500">消費期限：{item.date_expiration}</p>
                   </div>
                 </div>
-                {getStatusComponent({date_expiration:item.date_expiration})}
+                {getStatusComponent({ date_expiration: item.date_expiration })}
               </li>
             ))}
           </ul>
@@ -710,13 +682,13 @@ export const HomePage = ({
     </div>
 
     {/* デバッグ情報 */}
-    <div className="mt-10 p-4 bg-blue-50 text-blue-800 border border-blue-300 rounded-lg text-sm">
+    {/* <div className="mt-10 p-4 bg-blue-50 text-blue-800 border border-blue-300 rounded-lg text-sm">
       <strong>💡 データ連携情報:</strong>
       <p>
         アプリケーションは**FastAPIバックエンド** (`{API_BASE_URL}`)
         を介してMySQLデータベースと通信しています。
       </p>
       <p>データ件数: {items.length}件</p>
-    </div>
+    </div> */}
   </div>
 );

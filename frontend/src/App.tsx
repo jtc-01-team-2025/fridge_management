@@ -285,7 +285,6 @@ export function App() {
         return (
           <HomePage
             items={data}
-            urgentItems={urgentItems}
             togglePopup={togglePopup}
             navigate={navigate}
             getStatusComponent={ExpirationStatus}
@@ -306,7 +305,6 @@ export function App() {
         return (
           <HomePage
             items={data}
-            urgentItems={urgentItems}
             togglePopup={togglePopup}
             navigate={navigate}
             getStatusComponent={ExpirationStatus}
