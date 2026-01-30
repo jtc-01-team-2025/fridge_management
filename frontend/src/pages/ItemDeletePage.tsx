@@ -15,9 +15,11 @@ export const ItemDeletePage = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const toggleSelect = (id: number) => {
-    setSelectedItems((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    );
+    setSelectedItems([id]);
+    // 複数選択を許可する場合は以下を使用
+    // setSelectedItems((prev) =>
+    //   prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    // );
   };
 
   const handleDelete = async () => {
