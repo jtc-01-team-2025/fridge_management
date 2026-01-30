@@ -176,3 +176,18 @@ body {
     min-width: auto;
   }
 }
+
+
+/* ボタンをヘッダーと同じ緑色に強制する設定 */
+.action-button.primary {
+  background-color: #38c172 !important; /* ヘッダーと同じ緑 */
+  color: white !important;
+  border: none;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.action-button.primary:hover {
+  background-color: #2f9e61 !important; /* 少し濃い緑 */
+  transform: translateY(-2px);
+}
