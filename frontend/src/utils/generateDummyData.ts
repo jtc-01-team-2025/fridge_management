@@ -35,8 +35,8 @@ const randomExpiry = (): string => {
 
 // 12/19 一旦この機能にする
 export const generateTestItems = (n: number): FoodTypeNew[] => {
-  return Array.from({ length: n }).map(() => ({
-    id: n,
+  return Array.from({ length: n }).map((_, index) => ({
+    id: index + 1,
     name: randomFoodName(),
     date_expiration: randomExpiry(),
   }));
