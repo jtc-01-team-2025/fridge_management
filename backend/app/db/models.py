@@ -6,7 +6,8 @@ class FridgeContents(Base):
    
     __tablename__ = "fridge_contents"
 
-    itemID = Column(Integer, primary_key=True, index=True)
+    # itemID = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
     category = Column(String(50), nullable=False)
     date_purchase = Column(Date, nullable=False)

@@ -27,7 +27,7 @@ def get_items_sorted(db: Session):
 
 #削除処理機能
 def delete_item(db: Session, item_id: int):
-    item = db.query(models.FridgeContents).filter(models.FridgeContents.itemID == item_id).first() # itemID（主キー）で該当の食材を探して、あれば削除
+    item = db.query(models.FridgeContents).filter(models.FridgeContents.id == item_id).first() # itemID（主キー）で該当の食材を探して、あれば削除
     if item:
         db.delete(item)
         db.commit()
