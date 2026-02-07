@@ -1,0 +1,11 @@
+#食材追加機能
+    #テストファイルcreate_table.pyを実行し、食材の追加の格納機能を確認
+    podman exec -it fastapi-backend python -m app.db.create_table
+
+
+#他の機能
+    #backend コンテナに入る
+    podman exec -it fastapi-backend /bin/sh
+    #テストファイルtest_item_units.pyを実行し、残りの機能を確認（log見える）
+    python -m tests.test_item_utils
+
