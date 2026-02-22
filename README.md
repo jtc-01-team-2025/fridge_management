@@ -172,6 +172,17 @@ chmod +x compose-up.sh
 
 ./compose-up.sh   
 ```
+
+### 起動時(dev版)
+```bash
+# 初回のみ
+chmod +x compose-dev-up.sh    
+
+./compose-dev-up.sh   
+
+# 初回のみ
+podman exec -it fastapi-backend-dev python -m app.db.create_table
+```
 ### 停止時
 ```bash
 # 初回のみ

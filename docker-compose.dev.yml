@@ -27,6 +27,8 @@ services:
       - ./backend:/app
     networks:
       - app_network
+    depends_on:
+      - db
 
 
   db:

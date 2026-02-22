@@ -3,7 +3,7 @@
 from datetime import datetime
 import os
 
-from app.db.database import Base, engine, session
+from app.db.database import Base, engine, SessionLocal
 from app.db.models import FridgeContents  # ← ここを Item から修正
 
 SQLITE3_NAME = "fridge.db"  # SQLite ファイル名
@@ -12,27 +12,31 @@ if __name__ == "__main__":
     Base.metadata.create_all(engine)
     print("Tables created!")
 
-    # サンプルデータ
-    items = [
-        FridgeContents(
-            name="バナナ",
-            category="フルーツ",
-            registered_on =datetime(2025, 11, 5),
-            expiry_date=datetime(2025, 11, 12)
-        ),
-        FridgeContents(
-            name="牛乳",
-            category="乳製品",
-            registered_on=datetime(2025, 11, 6),
-            expiry_date=datetime(2025, 11, 10)
-        )
-    ]
+    # fridge_contents テーブルにデータが存在するか確認
+    db = SessionLocal()
+    existing_data = db.query(FridgeContents).first()
+    if existing_data:
+        print("fridge_contents テーブルには既にデータが存在します。サンプルデータの追加をスキップします。")
+    else:
+        # サンプルデータ
+        items = [
+            FridgeContents(
+                name="バナナ",
+                category="フルーツ",
+                date_purchase=datetime(2025, 11, 5),
+                date_expiration=datetime(2025, 11, 12)
+            ),
+            FridgeContents(
+                name="牛乳",
+                category="乳製品",
+                date_purchase=datetime(2025, 11, 6),
+                date_expiration=datetime(2025, 11, 10)
+            )
+        ]
 
-    # DB に INSERT
-    for it in items:
-        session.add(it)
+        # DB に INSERT
+        for it in items:
+            db.add(it)
 
-    session.commit()
-    session.close()
-
-    print("Test data inserted!")
+        db.commit()
+        print("Test data inserted!")
