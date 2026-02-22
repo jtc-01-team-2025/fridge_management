@@ -164,3 +164,18 @@ uvicorn app.main:app --reload --port 8000
 pip list
 podman logs fastapi-backend 
 
+## 2/22 podmanシェルスクリプト追加
+### 起動時
+```bash
+# 初回のみ
+chmod +x compose-up.sh   
+
+./compose-up.sh   
+```
+### 停止時
+```bash
+# 初回のみ
+chmod +x compose-down.sh   
+
+./compose-down.sh     
+```
