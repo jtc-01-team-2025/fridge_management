@@ -15,15 +15,14 @@ export const HomePage = ({
   items: FoodTypeNew[];
   urgentItems: FoodTypeNew[];
   togglePopup: () => void;
-  navigate: (path: "home" | "add" | "delete") => void;
+  // navigate: (path: "home" | "add" | "delete") => void;
+  navigate: (path: string) => void;
   getStatusComponent: ({ date_expiration }: { date_expiration: string }) => JSX.Element;
   userId: string;
 }) => (
   // 1. Tailwindのクラス(w-full max-w-4xl...)を削除し、App.cssの「home-container」に差し替え
   <div className="home-container">
-    <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-      🧊 冷蔵庫の在庫状況
-    </h1>
+    <h1 style={{ textAlign: "center", marginBottom: "30px" }}>🧊 冷蔵庫の在庫状況</h1>
 
     {/* セッションID表示 (控えめなデザインに変更) */}
     <div style={{ textAlign: "center", marginBottom: "20px", color: "#888", fontSize: "0.8em" }}>
@@ -32,16 +31,12 @@ export const HomePage = ({
 
     {/* 2. Flexレイアウトを App.css の「main-content」に差し替え */}
     <div className="main-content">
-      
       {/* 操作ボタンパネル */}
       <div className="action-buttons-panel">
         <h3 style={{ borderBottom: "1px solid #eee", paddingBottom: "10px" }}>アクション</h3>
 
         {/* 3. ボタンのクラスを App.css の「action-button primary」に統一 */}
-        <button
-          className="action-button primary"
-          onClick={() => navigate("add")}
-        >
+        <button className="action-button primary" onClick={() => navigate("/add")}>
           ➕ 食材の登録
         </button>
 
@@ -49,15 +44,14 @@ export const HomePage = ({
           className="action-button primary"
           onClick={togglePopup}
           /* 期限切れがある場合のみ赤色にする (インラインで指定) */
-          style={urgentItems.length > 0 ? { backgroundColor: "#e3342f", borderColor: "#e3342f" } : {}}
+          style={
+            urgentItems.length > 0 ? { backgroundColor: "#e3342f", borderColor: "#e3342f" } : {}
+          }
         >
           ⚠️ 期限が近い食材 ({urgentItems.length}件)
         </button>
 
-        <button
-          className="action-button primary"
-          onClick={() => navigate("delete")}
-        >
+        <button className="action-button primary" onClick={() => navigate("/delete")}>
           🗑️ 食材の削除
         </button>
       </div>
@@ -72,7 +66,14 @@ export const HomePage = ({
           <ul>
             {items.map((item) => (
               <li key={item.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
                   <div className="item-info">
                     <h4 style={{ margin: "0 0 5px 0" }}>{item.name}</h4>
                     <p style={{ margin: 0, fontSize: "0.9em", color: "#666" }}>
