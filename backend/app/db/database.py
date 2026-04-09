@@ -31,8 +31,10 @@
 #     finally:
 #         db.close()
 
-from sqlalchemy import create_engine
+import time
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
 # docker-compose.yml の設定に基づく接続情報
@@ -61,6 +63,24 @@ def get_db():
     finally:
         db.close()
 
+
+def wait_for_db(max_retries: int = 30, delay: float = 1.0) -> None:
+    """
+    DB が接続可能になるまで待機する。
+    """
+    for attempt in range(1, max_retries + 1):
+        try:
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+            return
+        except OperationalError:
+            print(f"Waiting for DB... attempt {attempt}/{max_retries}")
+            time.sleep(delay)
+    raise RuntimeError("Unable to connect to the database after multiple retries")
+
+
 def init_db():
     import app.db.models  # モデルをインポートして Base に登録
+
+    wait_for_db()
     Base.metadata.create_all(bind=engine)

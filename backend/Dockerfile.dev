@@ -1,13 +1,13 @@
 FROM python:3.11
 
-WORKDIR /fridge
+WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
 
 # PYTHONPATH を設定
-ENV PYTHONPATH=/fridge
+ENV PYTHONPATH=/app
 
 # FastAPIのホットリロード
 EXPOSE 8000
