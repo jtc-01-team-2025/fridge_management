@@ -34,14 +34,25 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+
+# 環境変数から接続情報を取得（.env または ECS タスク定義で設定すること）
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
+
+# SQLAlchemy の接続文字列を構築
+SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 # docker-compose.yml の設定に基づく接続情報
 # ホスト名はサービス名 'db'、ポートはMySQL標準の 3306
-SQLALCHEMY_DATABASE_URL = "mysql+mysqlconnector://fridge_user:fridge_pass@db:3306/fridge_db"
+# SQLALCHEMY_DATABASE_URL = "mysql+mysqlconnector://fridge_user:fridge_pass@db:3306/fridge_db"
 
 # データベースエンジンを作成
 # echo=TrueでSQLのログをコンソールに出力可能（デバッグ用）
-engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True, pool_recycle=3600)
 
 # 各リクエストでデータベースセッションを確立するためのSessionLocal
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

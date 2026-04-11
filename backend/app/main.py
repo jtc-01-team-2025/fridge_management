@@ -7,23 +7,20 @@ from app.db.database import engine
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
-# CORSミドルウェアの追加
+
+# @app.on_event("startup")
+# def on_startup():
+#     try:
+#         init_db()
+#     except Exception:
+#         print("skip db init")
+
+
+# 2026/4/11 リファクタリング課題：Corsが全部空いているため、セキュリティ上のリスクがある。必要なオリジンだけを許可するように変更する。
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Reactの開発サーバーのURL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.on_event("startup")
-def on_startup():
-    init_db()
-
-app.add_middleware(
-    CORSMiddleware,
-    # allow_origins=["*"],  
-    allow_origins=["http://localhost:5173"],  
+    allow_origins=["*"],  
+    # allow_origins=["http://localhost:5173"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -4,11 +4,8 @@ services:
   db:
     image: mysql:8.0
     container_name: fridge-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: fridge_db
-      MYSQL_USER: fridge_user
-      MYSQL_PASSWORD: fridge_pass
+    env_file:
+      - .env
     ports:
       - "3306:3306"
     volumes:
@@ -19,10 +16,10 @@ services:
     container_name: fastapi-backend
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-    environment:
-      - PYTHONUNBUFFERED=1
+    # volumes:
+    #   - ./backend:/app
+    env_file:
+      - .env
     depends_on:
       - db
   frontend:

@@ -1,11 +1,9 @@
 // src/Client.ts
 import type { FoodType } from "./types/FoodType";
-//const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
 // 環境変数からAPIのベースURLを取得。取得できない場合はローカル環境のデフォルトURLを使用。
 // 例: "http://127.0.0.1:8000"
-// const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 // APIレスポンスの型定義（成功時のメッセージを想定）
 export interface ApiResponse {
@@ -21,7 +19,7 @@ export interface ApiResponse {
  */
 export async function fetchData(): Promise<FoodType[]> {
   // エンドポイントは "/items/" を想定
-  const response = await fetch(`${API_BASE_URL}/items/`); 
+  const response = await fetch(`${API_BASE_URL}/items/`);
   if (!response.ok) {
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
@@ -38,13 +36,12 @@ export async function fetchData(): Promise<FoodType[]> {
  * @param foodData 登録する食材データ（FoodTypeからIDフィールドを除いたオブジェクト）
  * @returns 成功時のAPIレスポンス
  */
-export async function registerFoodItem(foodData: Omit<FoodType, 'id'>): Promise<ApiResponse> {
-  
+export async function registerFoodItem(foodData: Omit<FoodType, "id">): Promise<ApiResponse> {
   // エンドポイントは "/items/" を想定
-  const response = await fetch(`${API_BASE_URL}/items/`, { 
-    method: 'POST',
+  const response = await fetch(`${API_BASE_URL}/items/`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       // 'Authorization': 'Bearer YOUR_TOKEN_HERE', // 認証が必要な場合
     },
     body: JSON.stringify(foodData),
@@ -52,8 +49,10 @@ export async function registerFoodItem(foodData: Omit<FoodType, 'id'>): Promise<
 
   // レスポンスが成功ステータス (200-299) でない場合はエラーを投げる
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({ message: '不明なサーバーエラー' }));
-    throw new Error(`登録失敗! Status: ${response.status}. Message: ${errorBody.message || JSON.stringify(errorBody)}`);
+    const errorBody = await response.json().catch(() => ({ message: "不明なサーバーエラー" }));
+    throw new Error(
+      `登録失敗! Status: ${response.status}. Message: ${errorBody.message || JSON.stringify(errorBody)}`
+    );
   }
 
   // サーバーからの成功メッセージを返す
