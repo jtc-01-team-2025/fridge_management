@@ -1,6 +1,7 @@
 import "./App.css";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { ItemAddPage } from "./pages/ItemAddPage";
+import { ItemConsumePage } from "./pages/ItemComsumePage";
 import { ExpirationStatus } from "./components/Expiration";
 import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
@@ -89,6 +90,10 @@ const Header = ({
 
 // --- 3. メインAppコンポーネント ---
 
+
+type Page = "home" | "delete" | "add" | "consume";
+
+
 export function App() {
   const [data, setData] = useState<FoodTypeNew[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -129,24 +134,56 @@ export function App() {
   }, [fetchItems]);
 
   // CRUD操作
-  const handleAddItem = useCallback(
-    async (name: string, days: number) => {
-      const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0];
-      try {
-        await fetch(`${API_BASE_URL}/items`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-User-Id": userId },
-          body: JSON.stringify({ name, date_expiration: expiryDate }),
+
+  const handleAddItem = useCallback(async (name: string, days: number, quantity: number) => {
+    const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    try {
+      await fetch(`${API_BASE_URL}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-User-Id": userId },
+        body: JSON.stringify({ name, date_expiration: expiryDate, quantity }),
+      });
+      await fetchItems();
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  const handleDeleteItems = useCallback(async (ids: number[]) => {
+    try {
+      await Promise.all(
+        ids.map((id) =>
+          fetch(`${API_BASE_URL}/items/${id}`, {
+            method: "DELETE",
+            headers: { "X-User-Id": userId },
+          })
+        )
+      );
+      await fetchItems();
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  const handleConsumeItem = useCallback(async (id: number, quantity: number) => {
+    try {
+      if (useApiFlag) {
+        await fetch(`${API_BASE_URL}/items/${id}/consume/?consume_item=${quantity}`, {
+          method: "PUT",
+          headers: { "X-User-Id": userId },
         });
         await fetchItems();
-      } catch (e) {
-        console.error(e);
-        throw e;
+      } else {
+        setData((prev) =>
+          prev.map((it) =>
+            it.id === id ? { ...it, quantity: Math.max(0, (it.quantity ?? 0) - quantity) } : it
+          )
+        );
       }
-    },
-    [userId, fetchItems]
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  const urgentItems = useMemo(() => 
+    data.filter(item => {
+      const diff = (new Date(item.date_expiration).getTime() - new Date().setHours(0,0,0,0)) / 86400000;
+      return diff <= 7;
+    }), [data]
   );
 
   const handleDeleteItem = useCallback(
@@ -165,54 +202,41 @@ export function App() {
     [userId, fetchItems]
   );
 
-  const urgentItems = useMemo(
-    () =>
-      data.filter((item) => {
-        const diff =
-          (new Date(item.date_expiration).getTime() - new Date().setHours(0, 0, 0, 0)) / 86400000;
-        return diff <= 7;
-      }),
-    [data]
-  );
+
+  const normalizePath = (path: string): string => path.startsWith("/") ? path : `/${path}`;
 
   const navigate = (path: string): void => {
-    setCurrentPage(path);
-    window.location.href = path;
+    const target = normalizePath(path);
+    setCurrentPage(target);
+    window.location.href = target;
   };
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
 
   // ページレンダリング
-  // const renderPage = () => {
-  //   if (isLoading)
-  //     return (
-  //       <div className="home-container" style={{ textAlign: "center" }}>
-  //         <h3>データを読み込み中...</h3>
-  //       </div>
-  //     );
-  //   switch (currentPage) {
-  //     case "home":
-  //       return (
-  //         <HomePage
-  //           items={data}
-  //           urgentItems={urgentItems}
-  //           togglePopup={togglePopup}
-  //           navigate={navigate}
-  //           getStatusComponent={ExpirationStatus}
-  //           userId={userId}
-  //         />
-  //       );
-  //     case "delete":
-  //       return (
-  //         <ItemDeletePage
-  //           items={data}
-  //           onBack={() => navigate("home")}
-  //           onDeleteItem={handleDeleteItem}
-  //         />
-  //       );
-  //     case "add":
-  //       return <ItemAddPage onBack={() => navigate("home")} onAddItem={handleAddItem} />;
-  //   }
-  // };
+
+  const renderPage = () => {
+    if (isLoading) return <div className="home-container" style={{ textAlign: "center" }}><h3>データを読み込み中...</h3></div>;
+
+    switch (currentPage) {
+      case "home":
+        return (
+          <HomePage
+            items={data}
+            urgentItems={urgentItems}
+            togglePopup={togglePopup}
+            navigate={navigate}
+            getStatusComponent={ExpirationStatus}
+            userId={userId}
+          />
+        );
+      case "delete":
+        return <ItemDeletePage items={data} onBack={() => navigate("home")} onDeleteItems={handleDeleteItems} />;
+      case "add":
+        return <ItemAddPage onBack={() => navigate("home")} onAddItem={handleAddItem} />;
+      case "consume":
+        return <ItemConsumePage items={data} onBack={() => navigate("home")} onConsumeItems={handleConsumeItem} />;
+    }
+  };
 
   return (
     <div id="root">
@@ -259,8 +283,10 @@ export function App() {
                 element={
                   <ItemDeletePage
                     items={data}
-                    onBack={() => (window.location.href = "/")}
-                    onDeleteItem={handleDeleteItem}
+                    onBack={() => {
+                      window.location.href = "/";
+                    }}
+                    onDeleteItems={handleDeleteItems}
                   />
                 }
               />
@@ -270,6 +296,16 @@ export function App() {
                   <ItemAddPage
                     onBack={() => (window.location.href = "/")}
                     onAddItem={handleAddItem}
+                  />
+                }
+              />
+              <Route
+                path="/consume"
+                element={
+                  <ItemConsumePage
+                    items={data}
+                    onBack={() => (window.location.href = "/")}
+                    onConsumeItems={handleConsumeItem}
                   />
                 }
               />

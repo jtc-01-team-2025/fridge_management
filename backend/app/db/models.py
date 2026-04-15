@@ -12,4 +12,4 @@ class FridgeContents(Base):
     category = Column(String(50), nullable=False)
     date_purchase = Column(Date, nullable=True)
     date_expiration = Column(Date, nullable=False)
-    # quantity = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)

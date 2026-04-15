@@ -4,12 +4,13 @@ from app.api import schemas
 from datetime import date
 
 #create_itemを定義
-def create_item(db: Session, item: schemas.FridgeContentsCreate):
+def create_item(db: Session, item: schemas.ItemCreate):
     db_item = models.FridgeContents(
         name=item.name,
         category=item.category,
         date_purchase=item.date_purchase,  
-        date_expiration=item.date_expiration
+        date_expiration=item.date_expiration,
+        quantity=item.quantity
     )
 
     #入力されたデータをテーブルに格納
@@ -23,9 +24,20 @@ def create_item(db: Session, item: schemas.FridgeContentsCreate):
 def get_items_sorted(db: Session):
     items = db.query(models.FridgeContents).order_by(models.FridgeContents.date_expiration).all()
     print("取得したデータ:", items)
-    return items
+    # Return plain dicts so the frontend always receives predictable keys (including `id`)
+    result = []
+    for it in items:
+        result.append({
+            "id": getattr(it, "id", None),
+            "name": getattr(it, "name", ""),
+            "category": getattr(it, "category", ""),
+            "date_purchase": getattr(it, "date_purchase", None),
+            "date_expiration": getattr(it, "date_expiration", None),
+            "quantity": getattr(it, "quantity", 0),
+        })
+    return result
 
-#削除処理機能
+#削除処理機能(単独)
 def delete_item(db: Session, item_id: int):
     item = db.query(models.FridgeContents).filter(models.FridgeContents.id == item_id).first() # itemID（主キー）で該当の食材を探して、あれば削除
     if item:
@@ -34,3 +46,32 @@ def delete_item(db: Session, item_id: int):
         return True
     return False
 
+#削除処理機能(複数)
+def delete_multiple_items(db: Session, item_ids: list[int]) -> int:
+    deleted = (
+        db.query(models.FridgeContents)
+        .filter(models.FridgeContents.item_id.in_(item_ids))
+        .delete(synchronize_session=False)
+    )
+    db.commit()
+    return deleted
+
+#食材個数の更新機能
+def consume_item(db: Session, item_id: int, consume_item: int):
+    item = (
+    db.query(models.FridgeContents)
+    .filter(models.FridgeContents.id == item_id)
+    .first()
+    ) 
+    if (not item or consume_item <= 0):
+        return None
+
+    item.quantity -= consume_item
+
+    if item.quantity <= 0:
+        db.delete(item)
+    else:
+        db.add(item)
+
+    db.commit()
+    return item

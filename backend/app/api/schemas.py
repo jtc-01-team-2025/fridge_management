@@ -4,22 +4,18 @@ from typing import Optional, List
 
 
 class FridgeContentsBase(BaseModel):
-    id: int
+    #id: int
     name: str
     category: str = ""
     date_purchase: Optional[date] = None
     date_expiration: date
-    # quantity: int
+    quantity: int
 
     class Config:
         from_attributes = True
 
-class ItemCreate(BaseModel):
-    name: str
-    category: str = ""
-    date_purchase: Optional[date] = None
-    date_expiration: date
-    # quantity: int
+class ItemCreate(FridgeContentsBase):
+    pass
 
 class Item(BaseModel):
     id: int
@@ -27,7 +23,7 @@ class Item(BaseModel):
     category: str
     date_purchase: date
     date_expiration: date
-    # quantity: int
+    quantity: int
 
     model_config = {
         "from_attributes": True
@@ -39,13 +35,15 @@ class ItemResponse(BaseModel):
     category: str = ""
     date_purchase: Optional[date] = None
     date_expiration: date
-    # quantity: int
+    quantity: int
 
     class Config:
         from_attributes = True
 
+class ItemsDeleteRequest(BaseModel):
+    item_ids: List[int]
 
-# ユーザーが食材を登録するときに使う
-class FridgeContentsCreate(FridgeContentsBase):
-    pass
+
+
+
    

@@ -15,8 +15,7 @@ export const HomePage = ({
   items: FoodTypeNew[];
   urgentItems: FoodTypeNew[];
   togglePopup: () => void;
-  // navigate: (path: "home" | "add" | "delete") => void;
-  navigate: (path: string) => void;
+  navigate: (path: "home" | "add" | "delete" | "consume") => void;
   getStatusComponent: ({ date_expiration }: { date_expiration: string }) => JSX.Element;
   userId: string;
 }) => (
@@ -36,8 +35,15 @@ export const HomePage = ({
         <h3 style={{ borderBottom: "1px solid #eee", paddingBottom: "10px" }}>アクション</h3>
 
         {/* 3. ボタンのクラスを App.css の「action-button primary」に統一 */}
-        <button className="action-button primary" onClick={() => navigate("/add")}>
+        <button className="action-button primary" onClick={() => navigate("add")}>
           ➕ 食材の登録
+        </button>
+
+        <button
+          className="action-button primary"
+          onClick={() => navigate("consume")}
+        >
+          🗑️ 消費した食材の登録
         </button>
 
         <button
@@ -51,7 +57,7 @@ export const HomePage = ({
           ⚠️ 期限が近い食材 ({urgentItems.length}件)
         </button>
 
-        <button className="action-button primary" onClick={() => navigate("/delete")}>
+        <button className="action-button primary" onClick={() => navigate("delete")}>
           🗑️ 食材の削除
         </button>
       </div>
@@ -78,6 +84,9 @@ export const HomePage = ({
                     <h4 style={{ margin: "0 0 5px 0" }}>{item.name}</h4>
                     <p style={{ margin: 0, fontSize: "0.9em", color: "#666" }}>
                       消費期限：{item.date_expiration}
+                    </p>
+                    <p style={{ margin: 0, fontSize: "0.9em", color: "#444" }}>
+                      残り: {item.quantity} 個
                     </p>
                   </div>
                   {/* 右側のバッジ (安全/期限切れなど) */}

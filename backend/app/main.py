@@ -25,7 +25,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Prefix API routes 
+
+# Prefix API routes
 app.include_router(routes.router, prefix="/api")
 
 @app.get("/")

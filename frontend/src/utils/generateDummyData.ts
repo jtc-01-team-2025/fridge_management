@@ -15,7 +15,11 @@ const randomExpiry = (): string => {
   const now = new Date();
   const offsetDays = Math.floor(Math.random() * 11);
   now.setDate(now.getDate() + offsetDays);
-  return `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+  // return ISO-like YYYY-MM-DD for consistency with parsing elsewhere
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
 // const randomUrgent = (): boolean => {
@@ -39,5 +43,6 @@ export const generateTestItems = (n: number): FoodTypeNew[] => {
     id: index + 1,
     name: randomFoodName(),
     date_expiration: randomExpiry(),
+    quantity: Math.floor(Math.random() * 5) + 1,
   }));
 };

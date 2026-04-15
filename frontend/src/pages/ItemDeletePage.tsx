@@ -5,21 +5,20 @@ import type { FoodTypeNew } from "../types/FoodType";
 export const ItemDeletePage = ({
   items,
   onBack,
-  onDeleteItem,
+  onDeleteItems,
 }: {
   items: FoodTypeNew[];
   onBack: () => void;
-  onDeleteItem: (id: number) => Promise<void>;
+  onDeleteItems: (ids: number[]) => Promise<void>;
 }) => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const toggleSelect = (id: number) => {
-    setSelectedItems([id]);
     // 複数選択を許可する場合は以下を使用
-    // setSelectedItems((prev) =>
-    //   prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    // );
+    setSelectedItems((prev) =>
+    prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
   };
 
   const handleDelete = async () => {
@@ -31,7 +30,7 @@ export const ItemDeletePage = ({
 
     setIsDeleting(true);
     try {
-      await Promise.all(selectedItems.map((id) => onDeleteItem(id)));
+      await onDeleteItems(selectedItems);
       setSelectedItems([]);
       onBack();
     } catch (err) {

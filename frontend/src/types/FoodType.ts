@@ -4,6 +4,7 @@ export interface FoodTypeNew {
   id: number;
   name: string;
   date_expiration: string; // YYYY-MM-DD 形式
+  quantity: number;
 }
 export interface FoodType {
   itemID: number; // アイテムの一意の識別子
