@@ -1,107 +1,64 @@
-import type { JSX } from "react";
 import type { FoodTypeNew } from "../types/FoodType";
+import "../styles/Homepage.css";
+import { Refrigerator, ShoppingCart, ChefHat, MessageCircle, User } from "lucide-react";
+import Inventory from "../components/Inventory";
 
-// APIのURL（デバッグ表示用）
-const API_BASE_URL = "http://localhost:8000/api";
+const navItems = [
+  { path: "/", label: "在庫", icon: Refrigerator },
+  { path: "/shopping", label: "買い物", icon: ShoppingCart },
+  { path: "/recipes", label: "レシピ", icon: ChefHat },
+  { path: "/chat", label: "相談", icon: MessageCircle },
+  { path: "/profile", label: "設定", icon: User },
+];
 
 export const HomePage = ({
   items,
   urgentItems,
-  togglePopup,
   navigate,
-  getStatusComponent,
   userId,
 }: {
   items: FoodTypeNew[];
   urgentItems: FoodTypeNew[];
-  togglePopup: () => void;
-  navigate: (path: "home" | "add" | "delete" | "consume") => void;
-  getStatusComponent: ({ date_expiration }: { date_expiration: string }) => JSX.Element;
+  navigate: (path: string) => void;
   userId: string;
 }) => (
-  // 1. Tailwindのクラス(w-full max-w-4xl...)を削除し、App.cssの「home-container」に差し替え
-  <div className="home-container">
-    <h1 style={{ textAlign: "center", marginBottom: "30px" }}>🧊 冷蔵庫の在庫状況</h1>
-
-    {/* セッションID表示 (控えめなデザインに変更) */}
-    <div style={{ textAlign: "center", marginBottom: "20px", color: "#888", fontSize: "0.8em" }}>
-      <span>ID: {userId}</span>
-    </div>
-
-    {/* 2. Flexレイアウトを App.css の「main-content」に差し替え */}
-    <div className="main-content">
-      {/* 操作ボタンパネル */}
-      <div className="action-buttons-panel">
-        <h3 style={{ borderBottom: "1px solid #eee", paddingBottom: "10px" }}>アクション</h3>
-
-        {/* 3. ボタンのクラスを App.css の「action-button primary」に統一 */}
-        <button className="action-button primary" onClick={() => navigate("add")}>
-          ➕ 食材の登録
-        </button>
-
-        <button
-          className="action-button primary"
-          onClick={() => navigate("consume")}
-        >
-          🗑️ 消費した食材の登録
-        </button>
-
-        <button
-          className="action-button primary"
-          onClick={togglePopup}
-          /* 期限切れがある場合のみ赤色にする (インラインで指定) */
-          style={
-            urgentItems.length > 0 ? { backgroundColor: "#e3342f", borderColor: "#e3342f" } : {}
-          }
-        >
-          ⚠️ 期限が近い食材 ({urgentItems.length}件)
-        </button>
-
-        <button className="action-button primary" onClick={() => navigate("delete")}>
-          🗑️ 食材の削除
-        </button>
+  <div className="home-mobile">
+    {/* Mobile Header */}
+    <header className="home-mobile-header">
+      <div className="home-mobile-header-inner">
+        <h1 className="home-mobile-title">在庫</h1>
+        <span className="home-mobile-user">ID: {userId}</span>
       </div>
+    </header>
 
-      {/* 登録された食材のリスト表示パネル */}
-      <div className="item-list-panel">
-        <h3>登録された食材リスト</h3>
+    {/* Main Content */}
+    <main className="home-mobile-main">
+      <Inventory inventory={items} expiringItems={urgentItems} />
+    </main>
 
-        {items.length === 0 ? (
-          <p style={{ color: "#999", fontStyle: "italic" }}>まだ食材が登録されていません。</p>
-        ) : (
-          <ul>
-            {items.map((item) => (
-              <li key={item.id}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    width: "100%",
-                  }}
-                >
-                  <div className="item-info">
-                    <h4 style={{ margin: "0 0 5px 0" }}>{item.name}</h4>
-                    <p style={{ margin: 0, fontSize: "0.9em", color: "#666" }}>
-                      消費期限：{item.date_expiration}
-                    </p>
-                    <p style={{ margin: 0, fontSize: "0.9em", color: "#444" }}>
-                      残り: {item.quantity} 個
-                    </p>
-                  </div>
-                  {/* 右側のバッジ (安全/期限切れなど) */}
-                  {getStatusComponent({ date_expiration: item.date_expiration })}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+    <nav className="home-mobile-nav">
+      <div className="home-mobile-nav-inner">
+        <div className="home-mobile-nav-list">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = window.location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                type="button"
+                // onClick={() => navigate(item.path)}
+                onClick={() => navigate("home")}
+                className={isActive ? "home-mobile-nav-item active" : "home-mobile-nav-item"}
+              >
+                <Icon
+                  className={isActive ? "home-mobile-nav-icon active" : "home-mobile-nav-icon"}
+                />{" "}
+                <span className="home-mobile-nav-label">{item.label}</span>{" "}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-
-    {/* 下部のデバッグ情報は削除、またはシンプルに */}
-    <div style={{ marginTop: "30px", fontSize: "12px", color: "#ccc", textAlign: "center" }}>
-      Connected to API: {API_BASE_URL}
-    </div>
+    </nav>
   </div>
 );

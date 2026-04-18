@@ -2,7 +2,6 @@ import "./App.css";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { ItemAddPage } from "./pages/ItemAddPage";
 import { ItemConsumePage } from "./pages/ItemComsumePage";
-import { ExpirationStatus } from "./components/Expiration";
 import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
 import type { FoodTypeNew } from "./types/FoodType";
@@ -27,77 +26,75 @@ const getOrCreateUserId = (): string => {
 
 // --- 2. 共通パーツ (CSSを反映させるための構造) ---
 
-const Header = ({
-  navigate,
-  currentPage,
-}: {
-  navigate: (path: string) => void;
-  currentPage: string;
-}) => (
-  // インラインスタイルで App.css と調和する色を設定
-  <header
-    style={{
-      backgroundColor: "#38c172",
-      padding: "15px 0",
-      color: "white",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    }}
-  >
-    <div
-      style={{
-        maxWidth: "1000px",
-        margin: "0 auto",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 20px",
-      }}
-    >
-      <h2 style={{ margin: 0 }}>🧊 Fridge Manager</h2>
-      <nav>
-        <button
-          onClick={() => navigate("/")}
-          className={`action-button ${currentPage === "home" ? "primary" : ""}`}
-          style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-        >
-          ホーム
-        </button>
-        <button
-          onClick={() => navigate("/add")}
-          className={`action-button ${currentPage === "add" ? "primary" : ""}`}
-          style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-        >
-          登録
-        </button>
-        <button
-          onClick={() => navigate("/delete")}
-          className={`action-button ${currentPage === "delete" ? "primary" : ""}`}
-          style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-        >
-          削除
-        </button>
-        <button
-          onClick={() => navigate("/login")}
-          className={`action-button ${currentPage === "delete" ? "primary" : ""}`}
-          style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-        >
-          ログイン
-        </button>
-      </nav>
-    </div>
-  </header>
-);
+// const Header = ({
+//   navigate,
+//   currentPage,
+// }: {
+//   navigate: (path: string) => void;
+//   currentPage: string;
+// }) => (
+//   // インラインスタイルで App.css と調和する色を設定
+//   <header
+//     style={{
+//       backgroundColor: "#38c172",
+//       padding: "15px 0",
+//       color: "white",
+//       boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+//     }}
+//   >
+//     <div
+//       style={{
+//         maxWidth: "1000px",
+//         margin: "0 auto",
+//         display: "flex",
+//         justifyContent: "space-between",
+//         alignItems: "center",
+//         padding: "0 20px",
+//       }}
+//     >
+//       <h2 style={{ margin: 0 }}>🧊 Fridge Manager</h2>
+//       <nav>
+//         <button
+//           onClick={() => navigate("/")}
+//           className={`action-button ${currentPage === "home" ? "primary" : ""}`}
+//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
+//         >
+//           ホーム
+//         </button>
+//         <button
+//           onClick={() => navigate("/add")}
+//           className={`action-button ${currentPage === "add" ? "primary" : ""}`}
+//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
+//         >
+//           登録
+//         </button>
+//         <button
+//           onClick={() => navigate("/delete")}
+//           className={`action-button ${currentPage === "delete" ? "primary" : ""}`}
+//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
+//         >
+//           削除
+//         </button>
+//         <button
+//           onClick={() => navigate("/login")}
+//           className={`action-button ${currentPage === "delete" ? "primary" : ""}`}
+//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
+//         >
+//           ログイン
+//         </button>
+//       </nav>
+//     </div>
+//   </header>
+// );
 
 // --- 3. メインAppコンポーネント ---
 
-
-type Page = "home" | "delete" | "add" | "consume";
-
+// type Page = "home" | "delete" | "add" | "consume";
 
 export function App() {
   const [data, setData] = useState<FoodTypeNew[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [currentPage, setCurrentPage] = useState<string>(window.location.pathname);
+  // const [currentPage, setCurrentPage] = useState<string>(window.location.pathname);
   const [isLoading, setIsLoading] = useState(true);
 
   const useApiFlag = import.meta.env.VITE_USE_API === "true";
@@ -135,63 +132,16 @@ export function App() {
 
   // CRUD操作
 
-  const handleAddItem = useCallback(async (name: string, days: number, quantity: number) => {
-    const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-    try {
-      await fetch(`${API_BASE_URL}/items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-User-Id": userId },
-        body: JSON.stringify({ name, date_expiration: expiryDate, quantity }),
-      });
-      await fetchItems();
-    } catch (e) { console.error(e); throw e; }
-  }, [userId, fetchItems]);
-
-  const handleDeleteItems = useCallback(async (ids: number[]) => {
-    try {
-      await Promise.all(
-        ids.map((id) =>
-          fetch(`${API_BASE_URL}/items/${id}`, {
-            method: "DELETE",
-            headers: { "X-User-Id": userId },
-          })
-        )
-      );
-      await fetchItems();
-    } catch (e) { console.error(e); throw e; }
-  }, [userId, fetchItems]);
-
-  const handleConsumeItem = useCallback(async (id: number, quantity: number) => {
-    try {
-      if (useApiFlag) {
-        await fetch(`${API_BASE_URL}/items/${id}/consume/?consume_item=${quantity}`, {
-          method: "PUT",
-          headers: { "X-User-Id": userId },
-        });
-        await fetchItems();
-      } else {
-        setData((prev) =>
-          prev.map((it) =>
-            it.id === id ? { ...it, quantity: Math.max(0, (it.quantity ?? 0) - quantity) } : it
-          )
-        );
-      }
-    } catch (e) { console.error(e); throw e; }
-  }, [userId, fetchItems]);
-
-  const urgentItems = useMemo(() => 
-    data.filter(item => {
-      const diff = (new Date(item.date_expiration).getTime() - new Date().setHours(0,0,0,0)) / 86400000;
-      return diff <= 7;
-    }), [data]
-  );
-
-  const handleDeleteItem = useCallback(
-    async (id: number) => {
+  const handleAddItem = useCallback(
+    async (name: string, days: number, quantity: number) => {
+      const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
       try {
-        await fetch(`${API_BASE_URL}/items/${id}`, {
-          method: "DELETE",
-          headers: { "X-User-Id": userId },
+        await fetch(`${API_BASE_URL}/items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-User-Id": userId },
+          body: JSON.stringify({ name, date_expiration: expiryDate, quantity }),
         });
         await fetchItems();
       } catch (e) {
@@ -202,46 +152,132 @@ export function App() {
     [userId, fetchItems]
   );
 
+  const handleDeleteItems = useCallback(
+    async (ids: number[]) => {
+      try {
+        await Promise.all(
+          ids.map((id) =>
+            fetch(`${API_BASE_URL}/items/${id}`, {
+              method: "DELETE",
+              headers: { "X-User-Id": userId },
+            })
+          )
+        );
+        await fetchItems();
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+    [userId, fetchItems]
+  );
 
-  const normalizePath = (path: string): string => path.startsWith("/") ? path : `/${path}`;
+  const handleConsumeItem = useCallback(
+    async (id: number, quantity: number) => {
+      try {
+        if (useApiFlag) {
+          await fetch(`${API_BASE_URL}/items/${id}/consume/?consume_item=${quantity}`, {
+            method: "PUT",
+            headers: { "X-User-Id": userId },
+          });
+          await fetchItems();
+        } else {
+          setData((prev) =>
+            prev.map((it) =>
+              it.id === id ? { ...it, quantity: Math.max(0, (it.quantity ?? 0) - quantity) } : it
+            )
+          );
+        }
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+    [userId, fetchItems]
+  );
+
+  const urgentItems = useMemo(
+    () =>
+      data.filter((item) => {
+        const diff =
+          (new Date(item.date_expiration).getTime() - new Date().setHours(0, 0, 0, 0)) / 86400000;
+        return diff <= 3;
+      }),
+    [data]
+  );
+
+  // const handleDeleteItem = useCallback(
+  //   async (id: number) => {
+  //     try {
+  //       await fetch(`${API_BASE_URL}/items/${id}`, {
+  //         method: "DELETE",
+  //         headers: { "X-User-Id": userId },
+  //       });
+  //       await fetchItems();
+  //     } catch (e) {
+  //       console.error(e);
+  //       throw e;
+  //     }
+  //   },
+  //   [userId, fetchItems]
+  // );
+
+  const normalizePath = (path: string): string => (path.startsWith("/") ? path : `/${path}`);
 
   const navigate = (path: string): void => {
     const target = normalizePath(path);
-    setCurrentPage(target);
+    // setCurrentPage(target);
     window.location.href = target;
   };
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
 
   // ページレンダリング
 
-  const renderPage = () => {
-    if (isLoading) return <div className="home-container" style={{ textAlign: "center" }}><h3>データを読み込み中...</h3></div>;
+  // const renderPage = () => {
+  //   if (isLoading)
+  //     return (
+  //       <div className="home-container" style={{ textAlign: "center" }}>
+  //         <h3>データを読み込み中...</h3>
+  //       </div>
+  //     );
 
-    switch (currentPage) {
-      case "home":
-        return (
-          <HomePage
-            items={data}
-            urgentItems={urgentItems}
-            togglePopup={togglePopup}
-            navigate={navigate}
-            getStatusComponent={ExpirationStatus}
-            userId={userId}
-          />
-        );
-      case "delete":
-        return <ItemDeletePage items={data} onBack={() => navigate("home")} onDeleteItems={handleDeleteItems} />;
-      case "add":
-        return <ItemAddPage onBack={() => navigate("home")} onAddItem={handleAddItem} />;
-      case "consume":
-        return <ItemConsumePage items={data} onBack={() => navigate("home")} onConsumeItems={handleConsumeItem} />;
-    }
-  };
+  //   switch (currentPage) {
+  //     case "home":
+  //       return (
+  //         <HomePage
+  //           items={data}
+  //           urgentItems={urgentItems}
+  //           togglePopup={togglePopup}
+  //           navigate={navigate}
+  //           getStatusComponent={ExpirationStatus}
+  //           userId={userId}
+  //         />
+  //       );
+  //     case "delete":
+  //       return (
+  //         <ItemDeletePage
+  //           items={data}
+  //           onBack={() => navigate("home")}
+  //           onDeleteItems={handleDeleteItems}
+  //         />
+  //       );
+  //     case "add":
+  //       return <ItemAddPage onBack={() => navigate("home")} onAddItem={handleAddItem} />;
+  //     case "consume":
+  //       return (
+  //         <ItemConsumePage
+  //           items={data}
+  //           onBack={() => navigate("home")}
+  //           onConsumeItems={handleConsumeItem}
+  //         />
+  //       );
+  //   }
+  // };
 
   return (
     <div id="root">
       {/* App.css の #root 設定を適用 */}
-      <Header navigate={navigate} currentPage={currentPage} />
+      {/* <Header navigate={navigate} currentPage={currentPage} /> */}
       {/* <main style={{ padding: "20px" }}>
         {renderPage()}
         </main> */}
@@ -271,9 +307,7 @@ export function App() {
                   <HomePage
                     items={data}
                     urgentItems={urgentItems}
-                    togglePopup={togglePopup}
                     navigate={navigate}
-                    getStatusComponent={ExpirationStatus}
                     userId={userId}
                   />
                 }

@@ -1,0 +1,169 @@
+/* ホーム画面のコンテナ */
+.home-container {
+  /* max-width: 1000px; */
+  max-width: 100%;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: white;
+}
+
+/* メインコンテンツ（リストとボタンを Flex で配置） */
+.main-content {
+  display: block;
+  flex-wrap: wrap; /* 小さい画面では折り返す */
+  justify-content: space-between;
+  gap: 30px;
+  padding: 20px 0;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+/* リストパネル (左側) */
+.item-list-panel {
+  padding: 20px;
+  min-width: 300px;
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
+}
+
+.item-list-panel h3 {
+  margin-top: 0;
+  /* border-bottom: 1px solid #eee; */
+  padding-bottom: 10px;
+  /* color: #38c172; */
+}
+
+.item-list-panel ul {
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-list-panel li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10px;
+  font-size: 1.1em;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.item-list-panel li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.item-left {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.item-info h3 {
+  font-size: 18px;
+  margin: 0;
+}
+.item-info p {
+  font-size: 14px;
+  margin: 2px 0 0;
+  color: #777;
+}
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+.safe {
+  background: #4caf50;
+}
+
+.warning {
+  background: #f0a43b;
+}
+
+.expired {
+  background: #e05252;
+}
+
+/* 期限が迫っているアイテムのスタイル (赤文字) */
+.item-list-panel li.urgent {
+  color: #e3342f; /* 赤色 */
+  font-weight: 600;
+}
+
+.item-list-panel li .expiry-date {
+  font-weight: 400;
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+
+/* 操作ボタンパネル (右側) */
+.action-buttons-panel {
+  /* flex: 1; 
+  gap: 15px; 
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  margin-left: auto;
+  margin-right: auto; */
+  display: grid;
+  grid-auto-flow: column;
+  gap: 1rem;
+  width: fit-content;
+  margin-left: auto;
+}
+
+/* ボタンの共通スタイル */
+.action-button {
+  padding: 15px 10px;
+  border: 2px solid #38c172;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:hover {
+  background-color: #38c172;
+  border: none;
+  color: white;
+  font-weight: bold;
+  /* transform: translateY(-2px); */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+s
+/* プライマリボタン (食材の登録へ) のスタイル強調 */
+.action-button.primary {
+  background-color: #38c172;
+}
+
+.action-button.primary:hover {
+  background-color: #2f9e61;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column; /* 画面が狭いときは縦に並べる */
+  }
+  .home-container {
+    margin: 20px;
+    padding: 15px;
+  }
+  .item-list-panel,
+  .action-buttons-panel {
+    flex: none;
+    width: 100%;
+    min-width: auto;
+  }
+}

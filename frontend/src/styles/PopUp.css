@@ -35,3 +35,52 @@
 .closeButton:hover {
   background-color: #2d995b;
 }
+
+.container {
+  max-width: 1000px;
+  margin: 5px auto;
+  padding: 0 20px;
+  /* border-radius: 12px; */
+  background-color: white;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
+  text-align: left;
+}
+
+.popo-header {
+  /* font-size: 1.5rem; */
+  font-weight: bold;
+
+  margin: 0;
+}
+
+.popup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.popup-label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.popup-input {
+  height: 30px;
+  border: 1px solid var(--border-input, #d1d5db);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-input-background, #fff);
+  font-size: 1rem;
+}
+
+.popup-submit-button {
+  padding: 5px;
+  font-size: 0.9rem;
+  background-color: #38c172;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}

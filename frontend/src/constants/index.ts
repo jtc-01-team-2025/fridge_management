@@ -39,3 +39,9 @@ export const foodNames = [
   "ツナ缶",
   "コーン缶",
 ];
+
+export const categories = ["野菜", "果物", "肉類", "魚介類", "乳製品", "調味料", "飲料", "その他"];
+
+export const locations = ["冷蔵", "冷凍", "常温"];
+
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
