@@ -195,7 +195,11 @@ const Inventory = ({
                           </button>
                           <button
                             className="inventory-btn inventory-icon-btn-danger"
-                            onClick={async () => await deleteInventoryItem(item.id)}
+                            onClick={async () =>
+                              await deleteInventoryItem(item.id)
+                                .then(() => window.alert("削除しました"))
+                                .catch(() => window.alert("削除に失敗しました"))
+                            }
                           >
                             <Trash2 />
                           </button>
