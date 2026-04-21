@@ -6,6 +6,7 @@ const API_BASE_URL = "http://localhost:8000/api";
 
 export const HomePage = ({
   items,
+  groupedItems,
   urgentItems,
   togglePopup,
   navigate,
@@ -13,6 +14,7 @@ export const HomePage = ({
   userId,
 }: {
   items: FoodTypeNew[];
+  groupedItems: Record<string, FoodTypeNew[]>;
   urgentItems: FoodTypeNew[];
   togglePopup: () => void;
   navigate: (path: "home" | "add" | "delete" | "consume") => void;
@@ -66,38 +68,70 @@ export const HomePage = ({
       <div className="item-list-panel">
         <h3>登録された食材リスト</h3>
 
-        {items.length === 0 ? (
-          <p style={{ color: "#999", fontStyle: "italic" }}>まだ食材が登録されていません。</p>
-        ) : (
-          <ul>
-            {items.map((item) => (
-              <li key={item.id}>
-                <div
+        {Object.keys(groupedItems).length === 0 && items.length === 0 ? (
+            <p style={{ color: "#999", fontStyle: "italic" }}>
+              まだ食材が登録されていません。
+            </p>
+          ) : Object.keys(groupedItems).length > 0 ? (
+            Object.entries(groupedItems).map(([category, categoryItems]) => (
+              <div key={category} style={{ marginBottom: "30px" }}>
+                <h4
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    width: "100%",
+                    color: "#38c172",
+                    borderBottom: "2px solid #38c172",
+                    paddingBottom: "5px",
+                    marginBottom: "15px",
+                    fontSize: "1.1em"
                   }}
                 >
+                  {category} ({categoryItems.length}件)
+                </h4>
+
+                <ul>
+                  {categoryItems.map((item) => (
+                    <li key={item.id}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                        }}
+                      >
+                        <div className="item-info">
+                          <h4>{item.name}</h4>
+                          <p>消費期限：{item.date_expiration}</p>
+                          <p>残り: {item.quantity} 個</p>
+                        </div>
+
+                        {getStatusComponent({
+                          date_expiration: item.date_expiration
+                        })}
+                      </div>
+                    </li>
+                  ))}
+                  </ul>
+              </div>
+            ))
+          ) : (
+            <ul>
+              {items.map(item => (
+                <li key={item.id}>
                   <div className="item-info">
-                    <h4 style={{ margin: "0 0 5px 0" }}>{item.name}</h4>
-                    <p style={{ margin: 0, fontSize: "0.9em", color: "#666" }}>
-                      消費期限：{item.date_expiration}
-                    </p>
-                    <p style={{ margin: 0, fontSize: "0.9em", color: "#444" }}>
-                      残り: {item.quantity} 個
-                    </p>
+                    <h4>{item.name}</h4>
+                    <p>消費期限：{item.date_expiration}</p>
+                    <p>残り: {item.quantity} 個</p>
                   </div>
-                  {/* 右側のバッジ (安全/期限切れなど) */}
-                  {getStatusComponent({ date_expiration: item.date_expiration })}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
+
+                  {getStatusComponent({
+                    date_expiration: item.date_expiration
+                  })}
+                </li>
+              ))}
+            </ul>
+          )}
+            </div>
+          </div>
 
     {/* 下部のデバッグ情報は削除、またはシンプルに */}
     <div style={{ marginTop: "30px", fontSize: "12px", color: "#ccc", textAlign: "center" }}>

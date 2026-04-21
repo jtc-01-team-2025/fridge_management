@@ -23,6 +23,11 @@ def init_db():
                 print("Added fridge_contents.quantity")
                 cols.add("quantity")
 
+            if "category" not in cols:
+                conn.execute(text("ALTER TABLE fridge_contents ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'その他'"))
+                print("Added fridge_contents.category")
+                cols.add("category")
+
     print("Tables created successfully!")
 
 
