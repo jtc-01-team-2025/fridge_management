@@ -11,6 +11,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PopUp from "./components/PopUP";
 import Footer from "./components/Footer";
 import Login from "./pages/Login";
+import { RecipePage } from "./pages/RecipePage";
+import ProfilePage from "./pages/ProfilePage";
+import { ShoppingListPage } from "./pages/ShoppingListPage";
+import { ChatPage } from "./pages/ChatPage";
 
 // --- 1. API設定 & ユーザー管理 ---
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -303,14 +307,7 @@ export function App() {
             <Routes>
               <Route
                 path="/"
-                element={
-                  <HomePage
-                    items={data}
-                    urgentItems={urgentItems}
-                    navigate={navigate}
-                    userId={userId}
-                  />
-                }
+                element={<HomePage items={data} urgentItems={urgentItems} userId={userId} />}
               />
               <Route
                 path="/delete"
@@ -344,6 +341,10 @@ export function App() {
                 }
               />
               <Route path="/login" element={<Login />} />
+              <Route path="/recipes" element={<RecipePage userId={userId} />} />
+              <Route path="/profile" element={<ProfilePage userId={userId} />} />
+                <Route path="/shopping" element={<ShoppingListPage userId={userId} />} />
+                <Route path="/chat" element={<ChatPage userId={userId} />} />
             </Routes>
           </ErrorBoundary>
           <Footer />

@@ -8,12 +8,12 @@ from app.db.database import engine
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
-# @app.on_event("startup")
-# def on_startup():
-#     try:
-#         init_db()
-#     except Exception:
-#         print("skip db init")
+@app.on_event("startup")
+def on_startup():
+    try:
+        init_db()
+    except Exception:
+        print("skip db init")
 
 
 # 2026/4/11 リファクタリング課題：Corsが全部空いているため、セキュリティ上のリスクがある。必要なオリジンだけを許可するように変更する。

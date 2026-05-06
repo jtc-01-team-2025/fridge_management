@@ -44,6 +44,36 @@ class ItemsDeleteRequest(BaseModel):
     item_ids: List[int]
 
 
+# --- Shopping list ---
+
+class ShoppingItemCreate(BaseModel):
+    name: str
+    quantity: int
+    unit: str = "個"
+    category: str
+    user_id: str = ""
+
+    class Config:
+        from_attributes = True
+
+
+class ShoppingItemResponse(BaseModel):
+    id: int
+    user_id: str
+    name: str
+    quantity: int
+    unit: str
+    category: str
+    checked: bool
+
+    class Config:
+        from_attributes = True
+
+
+class ShoppingItemCheckRequest(BaseModel):
+    checked: bool
+
+
 
 
    
