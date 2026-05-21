@@ -46,7 +46,14 @@ def create_item(data: ItemCreate, db: Session):
         db.add(new_item)
         db.commit()
         db.refresh(new_item)
-        return new_item
+        return {
+            "id": new_item.id,
+            "name": new_item.name,
+            "category": id_to_name(new_item.category),
+            "date_purchase": new_item.date_purchase,
+            "date_expiration": new_item.date_expiration,
+            "quantity": new_item.quantity,
+        }
 
 
 # 賞味期限が切れているか判定
