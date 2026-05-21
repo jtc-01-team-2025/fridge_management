@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.db import models #models.pyの中のfridge_contentsクラスを使用するため
 from app.api import schemas
 from datetime import date
+from app.api.categories import id_to_name
 
 #create_itemを定義
 def create_item(db: Session, item: schemas.ItemCreate):
@@ -30,7 +31,8 @@ def get_items_sorted(db: Session):
         result.append({
             "id": getattr(it, "id", None),
             "name": getattr(it, "name", ""),
-            "category": getattr(it, "category", ""),
+            # Convert stored category id to display name
+            "category": id_to_name(getattr(it, "category", None)),
             "date_purchase": getattr(it, "date_purchase", None),
             "date_expiration": getattr(it, "date_expiration", None),
             "quantity": getattr(it, "quantity", 0),

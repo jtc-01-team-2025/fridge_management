@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from app.db import models
+from app.api.categories import id_to_name, name_to_id
 
 from app.db.database import get_db
 from app.api.schemas import ItemCreate
@@ -10,10 +11,13 @@ if TYPE_CHECKING:
     from app.api.schemas import Item
 
 def create_item(data: ItemCreate, db: Session):
+    # Convert category string or id to stored category id
+    category_id = name_to_id(data.category)
+
     # 同じ食材（name, category, date_expiration）が既に存在するかチェック
     existing_item = db.query(models.FridgeContents).filter(
         models.FridgeContents.name == data.name,
-        models.FridgeContents.category == data.category,
+        models.FridgeContents.category == category_id,
         models.FridgeContents.date_expiration == data.date_expiration
     ).first()
     
@@ -22,12 +26,19 @@ def create_item(data: ItemCreate, db: Session):
         existing_item.quantity += data.quantity
         db.commit()
         db.refresh(existing_item)
-        return existing_item
+        return {
+            "id": existing_item.id,
+            "name": existing_item.name,
+            "category": id_to_name(existing_item.category),
+            "date_purchase": existing_item.date_purchase,
+            "date_expiration": existing_item.date_expiration,
+            "quantity": existing_item.quantity,
+        }
     else:
         # 新しいアイテムを作成
         new_item = models.FridgeContents(
             name=data.name,
-            category=data.category,
+            category=category_id,
             date_purchase=data.date_purchase,
             date_expiration=data.date_expiration,
             quantity=data.quantity
@@ -54,7 +65,9 @@ def filter_valid(items: list[FridgeContents]) -> list[FridgeContents]:
 def group_by_category(items: list[FridgeContents]) -> dict[str, list[FridgeContents]]: #戻り値は「カテゴリ名 → 食材リスト」
     grouped = {}
     for item in items:
-        grouped.setdefault(item.category, []).append(item) # item.category（カテゴリ名）をキーにして、辞書に追加
+        # item.category is stored as an integer id in DB; convert to display name
+        key = id_to_name(getattr(item, "category", None))
+        grouped.setdefault(key, []).append(item)
     return grouped
 
 # 今日から指定日数以内に賞味期限が来る食材を抽出する（追加機能。デフォルト：3日）

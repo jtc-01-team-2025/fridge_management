@@ -6,7 +6,8 @@ from typing import Optional, List
 class FridgeContentsBase(BaseModel):
     #id: int
     name: str
-    category: str
+    # store category id when creating/updating; string names are also accepted and normalized by backend
+    category: int | str
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int

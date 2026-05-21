@@ -2,15 +2,15 @@ import { useState } from "react";
 
 // 食材カテゴリーの定義
 const FOOD_CATEGORIES = [
-  "野菜",
-  "果物",
-  "肉類",
-  "魚介類",
-  "乳製品",
-  "卵",
-  "調味料",
-  "飲料",
-  "その他",
+  { id: 1, label: "野菜" },
+  { id: 2, label: "果物" },
+  { id: 3, label: "肉類" },
+  { id: 4, label: "魚介類" },
+  { id: 5, label: "乳製品" },
+  { id: 6, label: "卵" },
+  { id: 7, label: "調味料" },
+  { id: 8, label: "飲料" },
+  { id: 9, label: "その他" },
 ];
 
 export const ItemAddPage = ({
@@ -18,14 +18,14 @@ export const ItemAddPage = ({
   onAddItem,
 }: {
   onBack: () => void;
-  onAddItem: (name: string, days: number, quantity: number, category: string) => Promise<void>;
+  onAddItem: (name: string, days: number, quantity: number, category: number) => Promise<void>;
 }) => {
   const [itemName, setItemName] = useState("");
   const [days, setDays] = useState(7);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [category, setCategory] = useState("その他");
+  const [category, setCategory] = useState(9);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,14 +115,14 @@ export const ItemAddPage = ({
           <select
             id="category"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(parseInt(e.target.value, 10))}
             required
             disabled={isLoading}
             style={{ padding: '12px', borderRadius: '8px', border: '1px solid #38c172', fontSize: '1rem' }}
           >
             {FOOD_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
               </option>
             ))}
           </select>

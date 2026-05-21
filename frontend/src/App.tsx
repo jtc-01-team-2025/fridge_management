@@ -152,7 +152,7 @@ export function App() {
 
   // CRUD操作
 
-  const handleAddItem = useCallback(async (name: string, days: number, quantity: number, category: string) => {
+  const handleAddItem = useCallback(async (name: string, days: number, quantity: number, category: number) => {
     const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
     try {
       await fetch(`${API_BASE_URL}/items`, {

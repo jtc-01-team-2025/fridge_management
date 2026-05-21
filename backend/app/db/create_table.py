@@ -22,13 +22,13 @@ if __name__ == "__main__":
         items = [
             FridgeContents(
                 name="バナナ",
-                category="フルーツ",
+                category=2,
                 date_purchase=datetime(2025, 11, 5),
                 date_expiration=datetime(2025, 11, 12)
             ),
             FridgeContents(
                 name="牛乳",
-                category="乳製品",
+                category=5,
                 date_purchase=datetime(2025, 11, 6),
                 date_expiration=datetime(2025, 11, 10)
             )

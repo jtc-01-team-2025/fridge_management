@@ -6,6 +6,7 @@ from app.services import fridge_service
 from app.api.schemas import ItemCreate
 from typing import Optional
 from app.db import models
+from app.api.categories import id_to_name
 
 router = APIRouter()
 
@@ -52,19 +53,19 @@ def read_grouped_items(db: Session = Depends(get_db)):
     items = db.query(models.FridgeContents).order_by(models.FridgeContents.date_expiration).all()
     grouped = {}
     for item in items:
-        category = item.category
-        if category not in grouped:
-            grouped[category] = []
-        # Pydanticモデルに変換
+        category_name = id_to_name(getattr(item, "category", None))
+        if category_name not in grouped:
+            grouped[category_name] = []
+        # Convert SQLAlchemy model to plain dict and include category name
         item_dict = {
             "id": item.id,
             "name": item.name,
-            "category": item.category,
+            "category": category_name,
             "date_purchase": item.date_purchase,
             "date_expiration": item.date_expiration,
             "quantity": item.quantity
         }
-        grouped[category].append(item_dict)
+        grouped[category_name].append(item_dict)
     return grouped
 
 # 食材単独削除用endpoint
