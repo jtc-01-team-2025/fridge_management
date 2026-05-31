@@ -3,6 +3,7 @@ export interface FoodTypeNew {
   // APIレスポンスで取得されるデータベースID
   id: number;
   name: string;
+  category: string; // カテゴリ
   date_expiration: string; // YYYY-MM-DD 形式
   quantity: number;
 }

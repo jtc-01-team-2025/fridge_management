@@ -1,25 +1,39 @@
 import { useState } from "react";
 
+// 食材カテゴリーの定義
+const FOOD_CATEGORIES = [
+  "野菜",
+  "果物",
+  "肉類",
+  "魚介類",
+  "乳製品",
+  "卵",
+  "調味料",
+  "飲料",
+  "その他",
+];
+
 export const ItemAddPage = ({
   onBack,
   onAddItem,
 }: {
   onBack: () => void;
-  onAddItem: (name: string, days: number, quantity: number) => Promise<void>;
+  onAddItem: (name: string, days: number, quantity: number, category: string) => Promise<void>;
 }) => {
   const [itemName, setItemName] = useState("");
   const [days, setDays] = useState(7);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [category, setCategory] = useState("その他");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (itemName.trim() && days > 0 && quantity > 0) {
+    if (itemName.trim() && days > 0 && quantity > 0 && category) {
       setIsLoading(true);
       setError(null);
       try {
-        await onAddItem(itemName.trim(), days, quantity);
+        await onAddItem(itemName.trim(), days, quantity, category);
         onBack();
       } catch (err) {
         console.error("登録エラー:", err);
@@ -96,12 +110,30 @@ export const ItemAddPage = ({
           />
         </div>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <label htmlFor="category" style={{ fontWeight: 'bold', color: '#555' }}>カテゴリー</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            disabled={isLoading}
+            style={{ padding: '12px', borderRadius: '8px', border: '1px solid #38c172', fontSize: '1rem' }}
+          >
+            {FOOD_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* 4. 登録ボタンを action-button primary に統一 */}
         <button
           type="submit"
           className="action-button primary"
           style={{ padding: '15px', fontSize: '1.1rem' }}
-          disabled={isLoading || !itemName.trim() || days <= 0 || quantity <= 0}
+          disabled={isLoading || !itemName.trim() || days <= 0 || quantity <= 0 || !category}
         >
           {isLoading ? "登録中..." : "冷蔵庫へ入れる"}
         </button>

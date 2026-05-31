@@ -6,7 +6,7 @@ from typing import Optional, List
 class FridgeContentsBase(BaseModel):
     #id: int
     name: str
-    category: str = ""
+    category: str
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int
@@ -32,7 +32,7 @@ class Item(BaseModel):
 class ItemResponse(BaseModel):
     id: int
     name: str
-    category: str = ""
+    category: str
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int

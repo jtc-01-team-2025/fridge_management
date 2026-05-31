@@ -35,8 +35,13 @@ services:
     container_name: fastapi-backend-dev
     ports:
       - "8000:8000"
-    env_file:
-      - .env
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: fridge_db
+      MYSQL_USER: fridge_user
+      MYSQL_PASSWORD: fridge_pass
+      DEBUG: "True"
     volumes:
       - ./backend:/app
     networks:

@@ -1,5 +1,5 @@
 // src/Client.ts
-import type { FoodType } from "./types/FoodType";
+import type { FoodType, FoodTypeNew } from "./types/FoodType";
 
 // 環境変数からAPIのベースURLを取得。取得できない場合はローカル環境のデフォルトURLを使用。
 // 例: "http://127.0.0.1:8000"
@@ -29,32 +29,19 @@ export async function fetchData(): Promise<FoodType[]> {
 }
 
 // ----------------------------------------------------
-// 2. 食材を登録する関数 (POST)
+// 3. カテゴリごとにグループ化された食材を取得する関数 (GET)
 // ----------------------------------------------------
 /**
- * 新しい食材データをバックエンドAPIにPOSTで送信し、登録する
- * @param foodData 登録する食材データ（FoodTypeからIDフィールドを除いたオブジェクト）
- * @returns 成功時のAPIレスポンス
+ * バックエンドAPIからカテゴリごとにグループ化された食材データを取得する
+ * @returns カテゴリ名をキーとしたFoodTypeNewの配列の辞書
  */
-export async function registerFoodItem(foodData: Omit<FoodType, "id">): Promise<ApiResponse> {
-  // エンドポイントは "/items/" を想定
-  const response = await fetch(`${API_BASE_URL}/items/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      // 'Authorization': 'Bearer YOUR_TOKEN_HERE', // 認証が必要な場合
-    },
-    body: JSON.stringify(foodData),
-  });
-
-  // レスポンスが成功ステータス (200-299) でない場合はエラーを投げる
+export async function fetchGroupedItems(): Promise<Record<string, FoodTypeNew[]>> {
+  // エンドポイントは "/items/grouped/" を想定
+  const response = await fetch(`${API_BASE_URL}/items/grouped/`);
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({ message: "不明なサーバーエラー" }));
-    throw new Error(
-      `登録失敗! Status: ${response.status}. Message: ${errorBody.message || JSON.stringify(errorBody)}`
-    );
+    throw new Error(`HTTP error! Status: ${response.status}`);
   }
-
-  // サーバーからの成功メッセージを返す
-  return (await response.json()) as ApiResponse;
+  const data = (await response.json()) as Record<string, FoodTypeNew[]>;
+  console.log("Fetched grouped data:", data);
+  return data;
 }

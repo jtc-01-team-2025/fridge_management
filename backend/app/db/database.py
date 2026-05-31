@@ -39,11 +39,11 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # 環境変数から接続情報を取得（.env または ECS タスク定義で設定すること）
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT", "3306")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_NAME = os.getenv("DB_NAME")
+DB_HOST = os.getenv("MYSQL_HOST")
+DB_PORT = os.getenv("MYSQL_PORT", "3306")
+DB_USER = os.getenv("MYSQL_USER")
+DB_PASSWORD = os.getenv("MYSQL_PASSWORD")
+DB_NAME = os.getenv("MYSQL_DATABASE")
 
 # SQLAlchemy の接続文字列を構築
 SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"

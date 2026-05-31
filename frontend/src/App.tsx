@@ -6,11 +6,13 @@ import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
 import type { FoodTypeNew } from "./types/FoodType";
 import { generateTestItems } from "./utils/generateDummyData";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PopUp from "./components/PopUP";
 import Footer from "./components/Footer";
 import Login from "./pages/Login";
+import { fetchData, fetchGroupedItems } from "./Client";
+
 
 // --- 1. API設定 & ユーザー管理 ---
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
@@ -93,9 +95,12 @@ const getOrCreateUserId = (): string => {
 
 export function App() {
   const [data, setData] = useState<FoodTypeNew[]>([]);
+  const [groupedData, setGroupedData] = useState<Record<string, FoodTypeNew[]>>({});
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  // const [currentPage, setCurrentPage] = useState<string>(window.location.pathname);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPage = location.pathname;
 
   const useApiFlag = import.meta.env.VITE_USE_API === "true";
   const userId = useMemo(() => getOrCreateUserId(), []);
@@ -105,22 +110,34 @@ export function App() {
     setIsLoading(true);
     try {
       if (useApiFlag) {
+        // 通常のアイテムリストを取得
         const response = await fetch(`${API_BASE_URL}/items`, {
           headers: { "X-User-Id": userId },
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const items: FoodTypeNew[] = await response.json();
+        console.log("items from API", items);
         setData(
           items.sort(
             (a, b) => new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime()
           )
         );
+
+        // カテゴリごとにグループ化されたデータを取得
+        const groupedResponse = await fetch(`${API_BASE_URL}/items/grouped/`, {
+          headers: { "X-User-Id": userId },
+        });
+        if (groupedResponse.ok) {
+          const groupedItems: Record<string, FoodTypeNew[]> = await groupedResponse.json();
+          setGroupedData(groupedItems);
+        }
       } else {
         setData(generateTestItems(5));
+        setGroupedData({});
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      setData([]);
+      setGroupedData({});
     } finally {
       setIsLoading(false);
     }
@@ -132,24 +149,55 @@ export function App() {
 
   // CRUD操作
 
-  const handleAddItem = useCallback(
-    async (name: string, days: number, quantity: number) => {
-      const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0];
-      try {
-        await fetch(`${API_BASE_URL}/items`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-User-Id": userId },
-          body: JSON.stringify({ name, date_expiration: expiryDate, quantity }),
+  const handleAddItem = useCallback(async (name: string, days: number, quantity: number, category: string) => {
+    const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    try {
+      await fetch(`${API_BASE_URL}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-User-Id": userId },
+        body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
+      });
+      await fetchItems();
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  // const handleDeleteItems = useCallback(async (ids: number[]) => {
+  //   try {
+  //     await Promise.all(
+  //       ids.map((id) =>
+  //         fetch(`${API_BASE_URL}/items/${id}`, {
+  //           method: "DELETE",
+  //           headers: { "X-User-Id": userId },
+  //         })
+  //       )
+  //     );
+  //     await fetchItems();
+  //   } catch (e) { console.error(e); throw e; }
+  // }, [userId, fetchItems]);
+
+  const handleConsumeItem = useCallback(async (id: number, quantity: number) => {
+    try {
+      if (useApiFlag) {
+        await fetch(`${API_BASE_URL}/items/${id}/consume/?consume_item=${quantity}`, {
+          method: "PUT",
+          headers: { "X-User-Id": userId },
         });
         await fetchItems();
-      } catch (e) {
-        console.error(e);
-        throw e;
+      } else {
+        setData((prev) =>
+          prev.map((it) =>
+            it.id === id ? { ...it, quantity: Math.max(0, (it.quantity ?? 0) - quantity) } : it
+          )
+        );
       }
-    },
-    [userId, fetchItems]
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  const urgentItems = useMemo(() => 
+    data.filter(item => {
+      const diff = (new Date(item.date_expiration).getTime() - new Date().setHours(0,0,0,0)) / 86400000;
+      return diff <= 7;
+    }), [data]
   );
 
   const handleDeleteItems = useCallback(
@@ -172,40 +220,6 @@ export function App() {
     [userId, fetchItems]
   );
 
-  const handleConsumeItem = useCallback(
-    async (id: number, quantity: number) => {
-      try {
-        if (useApiFlag) {
-          await fetch(`${API_BASE_URL}/items/${id}/consume/?consume_item=${quantity}`, {
-            method: "PUT",
-            headers: { "X-User-Id": userId },
-          });
-          await fetchItems();
-        } else {
-          setData((prev) =>
-            prev.map((it) =>
-              it.id === id ? { ...it, quantity: Math.max(0, (it.quantity ?? 0) - quantity) } : it
-            )
-          );
-        }
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-    },
-    [userId, fetchItems]
-  );
-
-  const urgentItems = useMemo(
-    () =>
-      data.filter((item) => {
-        const diff =
-          (new Date(item.date_expiration).getTime() - new Date().setHours(0, 0, 0, 0)) / 86400000;
-        return diff <= 3;
-      }),
-    [data]
-  );
-
   // const handleDeleteItem = useCallback(
   //   async (id: number) => {
   //     try {
@@ -222,57 +236,16 @@ export function App() {
   //   [userId, fetchItems]
   // );
 
-  const normalizePath = (path: string): string => (path.startsWith("/") ? path : `/${path}`);
+  // const normalizePath = (path: string): string => (path.startsWith("/") ? path : `/${path}`);
 
-  const navigate = (path: string): void => {
-    const target = normalizePath(path);
-    // setCurrentPage(target);
-    window.location.href = target;
-  };
+  // const navigate = (path: string): void => {
+  //   const target = normalizePath(path);
+  //   // setCurrentPage(target);
+  //   window.location.href = target;
+  // };
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
 
   // ページレンダリング
-
-  // const renderPage = () => {
-  //   if (isLoading)
-  //     return (
-  //       <div className="home-container" style={{ textAlign: "center" }}>
-  //         <h3>データを読み込み中...</h3>
-  //       </div>
-  //     );
-
-  //   switch (currentPage) {
-  //     case "home":
-  //       return (
-  //         <HomePage
-  //           items={data}
-  //           urgentItems={urgentItems}
-  //           togglePopup={togglePopup}
-  //           navigate={navigate}
-  //           getStatusComponent={ExpirationStatus}
-  //           userId={userId}
-  //         />
-  //       );
-  //     case "delete":
-  //       return (
-  //         <ItemDeletePage
-  //           items={data}
-  //           onBack={() => navigate("home")}
-  //           onDeleteItems={handleDeleteItems}
-  //         />
-  //       );
-  //     case "add":
-  //       return <ItemAddPage onBack={() => navigate("home")} onAddItem={handleAddItem} />;
-  //     case "consume":
-  //       return (
-  //         <ItemConsumePage
-  //           items={data}
-  //           onBack={() => navigate("home")}
-  //           onConsumeItems={handleConsumeItem}
-  //         />
-  //       );
-  //   }
-  // };
 
   return (
     <div id="root">
@@ -306,6 +279,7 @@ export function App() {
                 element={
                   <HomePage
                     items={data}
+                    groupedItems={groupedData}
                     urgentItems={urgentItems}
                     navigate={navigate}
                     userId={userId}
