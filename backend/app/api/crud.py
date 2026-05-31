@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.db import models #models.pyの中のfridge_contentsクラスを使用するため
 from app.api import schemas
-from datetime import date
+from datetime import date, datetime, timezone
 
 #create_itemを定義
 def create_item(db: Session, item: schemas.ItemCreate):
@@ -75,3 +75,47 @@ def consume_item(db: Session, item_id: int, consume_item: int):
 
     db.commit()
     return item
+
+# --- 買い物リスト ---
+
+def create_shopping_item(db: Session, item: schemas.ShoppingItemCreate):
+    db_item = models.ShoppingListItem(
+        user_id=item.user_id,
+        name=item.name,
+        quantity=item.quantity,
+        unit=item.unit,
+        category=item.category,
+    )
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+
+def get_shopping_items(db: Session, user_id: str):
+    return (
+        db.query(models.ShoppingListItem)
+        .filter(models.ShoppingListItem.user_id == user_id)
+        .order_by(models.ShoppingListItem.created_at)
+        .all()
+    )
+
+
+def check_shopping_item(db: Session, item_id: int, checked: bool):
+    item = db.query(models.ShoppingListItem).filter(models.ShoppingListItem.id == item_id).first()
+    if not item:
+        return None
+    item.checked = checked
+    item.checked_at = datetime.now(timezone.utc) if checked else None
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def delete_shopping_item(db: Session, item_id: int) -> bool:
+    item = db.query(models.ShoppingListItem).filter(models.ShoppingListItem.id == item_id).first()
+    if not item:
+        return False
+    db.delete(item)
+    db.commit()
+    return True

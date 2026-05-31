@@ -1,43 +1,47 @@
 import { useState } from "react";
 import "../styles/PopUp.css";
-import { API_BASE_URL, categories, locations } from "../constants";
-import type { FoodTypeNew } from "../types/FoodType";
+import { categories } from "../constants";
+import { registerShoppingItem } from "../Client";
+import type { FoodCategory, ShoppingItem } from "../types/FoodType";
 
-const EditPopUP = ({
-  inventory,
+const AddShoppingItemPopUP = ({
   closePopup,
+  onCreated,
+  user_id,
 }: {
-  inventory: FoodTypeNew;
   closePopup: () => void;
+  onCreated: (item: ShoppingItem) => void;
+  user_id: string;
 }) => {
-  const [itemName, setItemName] = useState(inventory.name);
-  const [date, setDate] = useState<Date>(new Date(inventory.date_expiration));
+  const [itemName, setItemName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState(inventory.quantity);
-
-  const handleUpdateItem = () => async (id: number, quantity: number) => {
-    try {
-      await fetch(`${API_BASE_URL}/items/${id}/consume/?consume_item=${quantity}`, {
-        method: "PUT",
-      });
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  };
+  const [quantity, setQuantity] = useState(1);
+  const [category, setCategory] = useState<FoodCategory>("その他");
+  const [unit, setUnit] = useState("個");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (itemName.trim() && date && quantity > 0) {
+    if (itemName.trim() && quantity > 0) {
       setIsLoading(true);
       setError(null);
       try {
-        await handleUpdateItem()(inventory.id, quantity);
         closePopup();
+        const created = await registerShoppingItem({
+          user_id,
+          name: itemName,
+          quantity,
+          unit,
+          category,
+        });
+        onCreated({
+          ...created,
+          id: created.id.toString(),
+          category: created.category as ShoppingItem["category"],
+        });
       } catch (err) {
-        console.error("更新エラー:", err);
-        setError("食材の更新中にエラーが発生しました。");
+        console.error("登録エラー:", err);
+        setError("商品の登録中にエラーが発生しました。");
       } finally {
         setIsLoading(false);
       }
@@ -48,8 +52,8 @@ const EditPopUP = ({
 
   return (
     <div className="container">
-      <h1 className="popo-header">食材を編集</h1>
-      <p>食材の情報を更新します</p>
+      <h2 className="popo-header">買い物リストに追加</h2>
+      <p>購入する商品を追加</p>
 
       {error && (
         <div
@@ -71,28 +75,29 @@ const EditPopUP = ({
       >
         <div className="popup-field">
           <label htmlFor="itemName" className="popup-label">
-            食材名
+            商品名
           </label>
           <input
             id="itemName"
             type="text"
-            value={inventory.name}
+            value={itemName}
             onChange={(e) => setItemName(e.target.value)}
             placeholder="例: 豆腐"
             required
-            disabled={true}
+            disabled={isLoading}
             className="popup-input"
           />
         </div>
         <div className="popup-field">
-          <label htmlFor="itemName" className="popup-label">
+          <label htmlFor="category" className="popup-label">
             カテゴリー
           </label>
           <select
             id="category"
-            // required
-            value={inventory.category || "不明"}
-            disabled={true}
+            value={category}
+            onChange={(e) => setCategory(e.target.value as FoodCategory)}
+            required
+            disabled={isLoading}
             className="popup-input"
           >
             <option value="" disabled>
@@ -120,63 +125,39 @@ const EditPopUP = ({
             <input
               id="quantity"
               type="number"
-              // value={inventory.quantity}
+              value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
               min="1"
-              max={inventory.quantity}
               required
               disabled={isLoading}
               className="popup-input"
             />
           </div>
           <div className="popup-field">
-            <label className="popup-label">単位</label>
+            <label htmlFor="unit" className="popup-label">
+              単位
+            </label>
             <input
+              id="unit"
               type="text"
-              defaultValue="個"
-              // onChange={(e) => setText(e.target.value)}
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
               required
-              disabled={true}
+              disabled={isLoading}
               className="popup-input"
             />
           </div>
         </div>
-        <div className="popup-field">
-          <label htmlFor="days" className="popup-label">
-            賞味期限
-          </label>
-          <input
-            id="days"
-            type="date"
-            value={inventory.date_expiration || ""}
-            onChange={(e) => setDate(new Date(e.target.value))}
-            required
-            disabled={true}
-            className="popup-input"
-          />
-        </div>
-        <div className="popup-field">
-          <label htmlFor="location" className="popup-label">
-            保存場所
-          </label>
-          <select id="location" disabled={true} className="popup-input">
-            {locations.map((loc) => (
-              <option key={loc} value={loc}>
-                {loc}
-              </option>
-            ))}
-          </select>
-        </div>
         <button
           type="submit"
           className="popup-submit-button"
-          disabled={isLoading || !itemName.trim() || !date || quantity <= 0}
+          disabled={isLoading || !itemName.trim() || quantity <= 0}
         >
-          {isLoading ? "更新中..." : "更新"}
+          {isLoading ? "登録中..." : "追加"}
         </button>
       </form>
     </div>
   );
 };
 
-export default EditPopUP;
+export default AddShoppingItemPopUP;

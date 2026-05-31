@@ -1,6 +1,6 @@
 import type { FoodTypeNew } from "../types/FoodType";
 import "../styles/Inventory.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API_BASE_URL, categories } from "../constants";
 import { AlertCircle, Pencil, Plus, Receipt, Trash2 } from "lucide-react";
 import PopUp from "./PopUP";
@@ -14,6 +14,7 @@ const Inventory = ({
   inventory: FoodTypeNew[];
   expiringItems: FoodTypeNew[];
 }) => {
+  const [inventories, setInventories] = useState(inventory);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
@@ -25,6 +26,14 @@ const Inventory = ({
     const diff = expiry.getTime() - today.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
+
+  useEffect(() => {
+    if (filterCategory === "all") {
+      setInventories(inventory);
+    } else {
+      setInventories(inventory.filter((item) => item.category === filterCategory));
+    }
+  }, [filterCategory]);
 
   const closeAddPopup = () => setIsAddPopupOpen(false);
   const closeEditPopup = () => setIsEditPopupOpen(false);
@@ -74,7 +83,7 @@ const Inventory = ({
     setIsEditPopupOpen(true);
   };
 
-  const selectedItem = inventory.find((item) => item.id === selectedItemId);
+  const selectedItem = inventories.find((item) => item.id === selectedItemId);
   return (
     <>
       <PopUp isVisible={isAddPopupOpen} onClose={() => closeAddPopup()}>
@@ -162,14 +171,16 @@ const Inventory = ({
               </div>
 
               <div className="inventory-card-list">
-                {inventory.map((item) => (
+                {inventories.map((item) => (
                   <div key={item.id} className="inventory-card">
                     <div className="inventory-card-content">
                       <div className="inventory-card-top">
                         <div className="inventory-card-main">
                           <h3 className="inventory-card-name">{item.name}</h3>
                           <div className="inventory-card-meta">
-                            <span className="inventory-card-meta-text">その他</span>
+                            <span className="inventory-card-meta-text">
+                              {item.category ? item.category : "不明"}
+                            </span>
                             <span className="inventory-card-meta-dot">•</span>
                             <span className="inventory-card-meta-text">冷蔵</span>
                           </div>

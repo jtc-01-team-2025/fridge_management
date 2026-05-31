@@ -8,13 +8,19 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [category, setCategory] = useState("その他");
 
   const handleAddItem = () => async (name: string, date: Date, quantity: number) => {
     try {
       await fetch(`${API_BASE_URL}/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, date_expiration: date.toISOString().split("T")[0], quantity }),
+        body: JSON.stringify({
+          name,
+          date_expiration: date.toISOString().split("T")[0],
+          quantity,
+          category,
+        }),
       });
     } catch (e) {
       console.error(e);
@@ -94,7 +100,8 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
           </label>
           <select
             id="category"
-            // required
+            required
+            onChange={(e) => setCategory(e.target.value)}
             disabled={isLoading}
             className="popup-input"
           >

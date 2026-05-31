@@ -1,11 +1,11 @@
 import "../styles/PopUp.css";
 
 type PopUpProps = {
-  isVisible: boolean;
+  isVisible?: boolean;
   onClose: () => void;
   children: React.ReactNode;
 };
-const PopUp: React.FC<PopUpProps> = ({ isVisible, onClose, children }) => {
+const PopUp: React.FC<PopUpProps> = ({ isVisible = false, onClose, children }) => {
   if (!isVisible) return null;
 
   return (

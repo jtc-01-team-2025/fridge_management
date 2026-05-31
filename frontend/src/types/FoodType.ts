@@ -1,4 +1,3 @@
-
 export interface FoodTypeNew {
   // APIレスポンスで取得されるデータベースID
   id: number;
@@ -14,3 +13,21 @@ export interface FoodType {
   date_purchase: string; // 購入日 (ISO 8601形式: YYYY-MM-DD)
   date_expiration: string; // 消費期限 (ISO 8601形式: YYYY-MM-DD)
 }
+export type FoodCategory =
+  | "野菜"
+  | "果物"
+  | "肉類"
+  | "魚介類"
+  | "乳製品"
+  | "調味料"
+  | "飲料"
+  | "その他";
+
+export type ShoppingItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: FoodCategory;
+  checked: boolean;
+};

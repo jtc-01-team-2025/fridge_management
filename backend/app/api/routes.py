@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from datetime import date
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import crud, schemas
-from app.db.database import get_db #DBセッション提供関数の取り込み: Depends(get_db)で、リクエストごとにDBセッションを用意してもらうために使う
+from app.db.database import get_db
 from app.services import fridge_service
-from app.api.schemas import ItemCreate
+from app.api import shopping_utils
 from typing import Optional
 from app.db import models
 
@@ -92,3 +93,42 @@ def consume_item(item_id: int, consume_item: int, db: Session = Depends(get_db))
     if updated_item is None:
         return {"error": "指定された食材が見つからないか、消費数が無効です"}
     return {"message": f"食材（ID: {item_id}）を{consume_item}個消費しました", "updated_item": updated_item}
+
+
+# =============================================================
+# 買い物リスト /shopping/
+# =============================================================
+
+# 一覧取得
+@router.get("/shopping/", response_model=list[schemas.ShoppingItemResponse])
+def get_shopping_items(user_id: str, db: Session = Depends(get_db)):
+    return crud.get_shopping_items(db, user_id)
+
+# アイテム追加
+@router.post("/shopping/", response_model=schemas.ShoppingItemResponse)
+def create_shopping_item(data: schemas.ShoppingItemCreate, db: Session = Depends(get_db)):
+    return crud.create_shopping_item(db, data)
+
+# チェック状態切り替え
+@router.put("/shopping/{item_id}/check/", response_model=schemas.ShoppingItemResponse)
+def check_shopping_item(item_id: int, data: schemas.ShoppingItemCheckRequest, db: Session = Depends(get_db)):
+    item = crud.check_shopping_item(db, item_id, data.checked)
+    if not item:
+        raise HTTPException(status_code=404, detail="アイテムが見つかりませんでした")
+    return item
+
+# アイテム削除
+@router.delete("/shopping/{item_id}")
+def delete_shopping_item(item_id: int, db: Session = Depends(get_db)):
+    success = crud.delete_shopping_item(db, item_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="アイテムが見つかりませんでした")
+    return {"message": f"アイテム（ID: {item_id}）を削除しました"}
+
+# 在庫へ移動
+# @router.post("/shopping/{item_id}/move-to-inventory/", response_model=schemas.ItemResponse)
+# def move_to_inventory(item_id: int, date_expiration: date, db: Session = Depends(get_db)):
+#     item = crud.move_to_inventory(db, item_id, date_expiration)
+#     if not item:
+#         raise HTTPException(status_code=404, detail="アイテムが見つかりませんでした")
+#     return item
