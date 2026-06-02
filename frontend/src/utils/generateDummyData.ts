@@ -44,5 +44,6 @@ export const generateTestItems = (n: number): FoodTypeNew[] => {
     name: randomFoodName(),
     date_expiration: randomExpiry(),
     quantity: Math.floor(Math.random() * 5) + 1,
+    category: "その他",
   }));
 };
