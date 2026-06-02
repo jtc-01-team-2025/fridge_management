@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.db import models #models.pyの中のfridge_contentsクラスを使用するため
 from app.api import schemas
 from datetime import date, datetime, timezone
+from app.api.categories import id_to_name
 
 #create_itemを定義
 def create_item(db: Session, item: schemas.ItemCreate):
@@ -30,7 +31,8 @@ def get_items_sorted(db: Session):
         result.append({
             "id": getattr(it, "id", None),
             "name": getattr(it, "name", ""),
-            "category": getattr(it, "category", ""),
+            # Convert stored category id to display name
+            "category": id_to_name(getattr(it, "category", None)),
             "date_purchase": getattr(it, "date_purchase", None),
             "date_expiration": getattr(it, "date_expiration", None),
             "quantity": getattr(it, "quantity", 0),
@@ -93,12 +95,24 @@ def create_shopping_item(db: Session, item: schemas.ShoppingItemCreate):
 
 
 def get_shopping_items(db: Session, user_id: str):
-    return (
+    items = (
         db.query(models.ShoppingListItem)
         .filter(models.ShoppingListItem.user_id == user_id)
         .order_by(models.ShoppingListItem.created_at)
         .all()
     )
+    for it in items:
+        cat = getattr(it, "category", None)
+        # 数値 or 数値文字列だけ id_to_name で変換
+        if isinstance(cat, int) or (isinstance(cat, str) and cat.strip().isdigit()):
+            it.category = id_to_name(int(cat))
+        # None/空はその他
+        elif cat is None or (isinstance(cat, str) and cat.strip() == ""):
+            it.category = id_to_name(None)
+        # 既に日本語カテゴリならそのまま
+        else:
+            it.category = str(cat).strip()
+    return items
 
 
 def check_shopping_item(db: Session, item_id: int, checked: bool):

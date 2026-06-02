@@ -6,7 +6,8 @@ from typing import Optional, List
 class FridgeContentsBase(BaseModel):
     #id: int
     name: str
-    category: str
+    # store category id when creating/updating; string names are also accepted and normalized by backend
+    category: int | str
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int
@@ -50,7 +51,7 @@ class ShoppingItemCreate(BaseModel):
     name: str
     quantity: int
     unit: str = "個"
-    category: str
+    category: str | int
     user_id: str = ""
 
     class Config:
@@ -63,7 +64,7 @@ class ShoppingItemResponse(BaseModel):
     name: str
     quantity: int
     unit: str
-    category: str
+    category: str | int
     checked: bool
 
     class Config:

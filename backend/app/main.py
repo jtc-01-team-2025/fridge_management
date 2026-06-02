@@ -9,6 +9,7 @@ from app.db.database import engine
 # ========================================
 # 【既存テーブルがある環境】マイグレーション機能付き（カラム追加対応）
 from app.db.init_db import init_db
+app = FastAPI() 
 
 @app.on_event("startup")
 def on_startup():

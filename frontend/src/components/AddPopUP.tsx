@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../styles/PopUp.css";
-import { API_BASE_URL, categories, locations } from "../constants";
+import { API_BASE_URL, locations, FOOD_CATEGORIES } from "../constants";
 
 const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
   const [itemName, setItemName] = useState("");
@@ -8,7 +8,7 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [category, setCategory] = useState("その他");
+  const [category, setCategory] = useState(9);
 
   const handleAddItem = () => async (name: string, date: Date, quantity: number) => {
     try {
@@ -100,17 +100,18 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
           </label>
           <select
             id="category"
+            value={category}
             required
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => setCategory(parseInt(e.target.value))}
             disabled={isLoading}
             className="popup-input"
           >
             <option value="" disabled>
               選択してください
             </option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+            {FOOD_CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
               </option>
             ))}
           </select>

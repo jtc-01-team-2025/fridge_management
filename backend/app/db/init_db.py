@@ -24,8 +24,9 @@ def init_db():
                 cols.add("quantity")
 
             if "category" not in cols:
-                conn.execute(text("ALTER TABLE fridge_contents ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'その他'"))
-                print("Added fridge_contents.category")
+                # Use integer category IDs in DB; default to 9 (その他)
+                conn.execute(text("ALTER TABLE fridge_contents ADD COLUMN category INT NOT NULL DEFAULT 9"))
+                print("Added fridge_contents.category (INT)")
                 cols.add("category")
 
     print("Tables created successfully!")

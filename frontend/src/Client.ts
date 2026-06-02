@@ -86,7 +86,7 @@ type CreateShoppingItemInput = {
   name: string;
   quantity: number;
   unit: string;
-  category: ShoppingItem["category"];
+  category: number;
 };
 
 export async function registerShoppingItem(
@@ -126,7 +126,10 @@ export async function deleteShoppingItem(itemId: string): Promise<ApiResponse> {
   return (await response.json()) as ApiResponse;
 }
 
-export async function updateShoppingItemCheck(itemId: string, checked: boolean): Promise<ShoppingItem> {
+export async function updateShoppingItemCheck(
+  itemId: string,
+  checked: boolean
+): Promise<ShoppingItem> {
   const response = await fetch(`${API_BASE_URL}/shopping/${itemId}/check/`, {
     method: "PUT",
     headers: {

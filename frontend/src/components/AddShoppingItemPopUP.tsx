@@ -1,8 +1,8 @@
 import { useState } from "react";
 import "../styles/PopUp.css";
-import { categories } from "../constants";
+import { FOOD_CATEGORIES } from "../constants";
 import { registerShoppingItem } from "../Client";
-import type { FoodCategory, ShoppingItem } from "../types/FoodType";
+import type { ShoppingItem } from "../types/FoodType";
 
 const AddShoppingItemPopUP = ({
   closePopup,
@@ -17,7 +17,7 @@ const AddShoppingItemPopUP = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [category, setCategory] = useState<FoodCategory>("その他");
+  const [category, setCategory] = useState(9);
   const [unit, setUnit] = useState("個");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,7 +95,7 @@ const AddShoppingItemPopUP = ({
           <select
             id="category"
             value={category}
-            onChange={(e) => setCategory(e.target.value as FoodCategory)}
+            onChange={(e) => setCategory(parseInt(e.target.value))}
             required
             disabled={isLoading}
             className="popup-input"
@@ -103,9 +103,9 @@ const AddShoppingItemPopUP = ({
             <option value="" disabled>
               選択してください
             </option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+            {FOOD_CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
               </option>
             ))}
           </select>

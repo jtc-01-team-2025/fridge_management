@@ -140,25 +140,54 @@ export function App() {
 
   // CRUD操作
 
-  const handleAddItem = useCallback(
-    async (name: string, days: number, quantity: number, category: string) => {
-      const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0];
-      try {
-        await fetch(`${API_BASE_URL}/items`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-User-Id": userId },
-          body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
-        });
-        await fetchItems();
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-    },
-    [userId, fetchItems]
-  );
+  // kyoji 
+  // const handleAddItem = useCallback(
+  //   async (name: string, days: number, quantity: number, category: string) => {
+  //     const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+  //       .toISOString()
+  //       .split("T")[0];
+  const handleAddItem = useCallback(async (name: string, days: number, quantity: number, category: number) => {
+    const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    try {
+      await fetch(`${API_BASE_URL}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-User-Id": userId },
+        body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
+      });
+      await fetchItems();
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  const handleDeleteItems = useCallback(async (ids: number[]) => {
+    try {
+      await Promise.all(
+        ids.map((id) =>
+          fetch(`${API_BASE_URL}/items/${id}`, {
+            method: "DELETE",
+            headers: { "X-User-Id": userId },
+          })
+        )
+      );
+      await fetchItems();
+    } catch (e) { console.error(e); throw e; }
+  }, [userId, fetchItems]);
+
+  // const handleDeleteItem = useCallback(
+  //   async (id: number) => {
+  //     try {
+  //       await fetch(`${API_BASE_URL}/items`, {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json", "X-User-Id": userId },
+  //         body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
+  //       });
+  //       await fetchItems();
+  //     } catch (e) {
+  //       console.error(e);
+  //       throw e;
+  //     }
+  //   },
+  //   [userId, fetchItems]
+  // );
 
   // const handleDeleteItems = useCallback(async (ids: number[]) => {
   //   try {
@@ -208,25 +237,25 @@ export function App() {
     [data]
   );
 
-  const handleDeleteItems = useCallback(
-    async (ids: number[]) => {
-      try {
-        await Promise.all(
-          ids.map((id) =>
-            fetch(`${API_BASE_URL}/items/${id}`, {
-              method: "DELETE",
-              headers: { "X-User-Id": userId },
-            })
-          )
-        );
-        await fetchItems();
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-    },
-    [userId, fetchItems]
-  );
+  // const handleDeleteItems = useCallback(
+  //   async (ids: number[]) => {
+  //     try {
+  //       await Promise.all(
+  //         ids.map((id) =>
+  //           fetch(`${API_BASE_URL}/items/${id}`, {
+  //             method: "DELETE",
+  //             headers: { "X-User-Id": userId },
+  //           })
+  //         )
+  //       );
+  //       await fetchItems();
+  //     } catch (e) {
+  //       console.error(e);
+  //       throw e;
+  //     }
+  //   },
+  //   [userId, fetchItems]
+  // );
 
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
 

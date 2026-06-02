@@ -41,6 +41,17 @@ export const foodNames = [
 ];
 
 export const categories = ["野菜", "果物", "肉類", "魚介類", "乳製品", "調味料", "飲料", "その他"];
+export const FOOD_CATEGORIES = [
+  { id: 1, label: "野菜" },
+  { id: 2, label: "果物" },
+  { id: 3, label: "肉類" },
+  { id: 4, label: "魚介類" },
+  { id: 5, label: "乳製品" },
+  { id: 6, label: "卵" },
+  { id: 7, label: "調味料" },
+  { id: 8, label: "飲料" },
+  { id: 9, label: "その他" },
+];
 
 export const locations = ["冷蔵", "冷凍", "常温"];
 

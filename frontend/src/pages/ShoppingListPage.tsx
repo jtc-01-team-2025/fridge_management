@@ -53,12 +53,12 @@ export const ShoppingListPage = ({ userId }: { userId: string }) => {
     // setShoppingList((prev) =>
     //   prev.map((item) => (item.id === id ? { ...updated, id: String(updated.id) } : item))
     // );
-     setShoppingList((prev) =>
-       prev.map((item) => (item.id === id ? updated : item))
-     );
+    setShoppingList((prev) => prev.map((item) => (item.id === id ? updated : item)));
   };
 
-  const handleMoveToInventory = (item: ShoppingItem) => {};
+  const handleMoveToInventory = (item: ShoppingItem) => {
+    console.log("在庫へ移動:", item);
+  };
   const checkedItems = shoppingList.filter((item) => item.checked);
   const uncheckedItems = shoppingList.filter((item) => !item.checked);
   return (
