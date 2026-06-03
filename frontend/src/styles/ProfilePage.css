@@ -2,6 +2,8 @@
   min-height: 100vh;
   padding: 16px;
   background: #f9fafb;
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-stack {
@@ -15,8 +17,10 @@
   gap: 8px;
 }
 
-.card-select {
+.card-select,
+.card-input {
   height: 30px;
+  width: 100%;
   border: 1px solid var(--border-input, #d1d5db);
   border-radius: 0.375rem;
   padding: 0.25rem 0.75rem;
@@ -35,11 +39,69 @@
 }
 
 .card-header {
-  padding: 24px 24px 0;
+  padding: 0 24px;
   display: grid;
   gap: 6px;
 }
 
 .card-content {
-  padding: 0 24px 24px;
+  padding: 0 24px;
+}
+
+.profile-label {
+  display: block;
+  margin: 8px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  font-size: 0.875rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.choice-chip:hover {
+  border-color: #9ca3af;
+}
+
+.choice-chip-dietary-active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.choice-chip-allergy-active {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.save-button {
+  width: min(100%, 320px);
+  height: 48px;
+  margin: 24px auto 0;
+  border: none;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
 }

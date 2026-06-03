@@ -31,3 +31,5 @@ export type ShoppingItem = {
   category: FoodCategory;
   checked: boolean;
 };
+
+export type Language = "ja" | "en" | "zh" | "ko";

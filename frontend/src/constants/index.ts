@@ -1,3 +1,5 @@
+import type { Language } from "../types/FoodType";
+
 export const foodNames = [
   "りんご",
   "バナナ",
@@ -56,3 +58,38 @@ export const FOOD_CATEGORIES = [
 export const locations = ["冷蔵", "冷凍", "常温"];
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
+export const dietaryOptions: readonly string[] = [
+  "ベジタリアン",
+  "ヴィーガン",
+  "低糖質",
+  "低脂肪",
+  "グルテンフリー",
+];
+
+export const allergyOptions: readonly string[] = [
+  "卵",
+  "乳製品",
+  "小麦",
+  "そば",
+  "落花生",
+  "えび",
+  "かに",
+  "大豆",
+];
+
+export const languageNames: Record<Language, string> = {
+  ja: "日本語",
+  en: "English",
+  zh: "中文",
+  ko: "한국어",
+};
+
+export const budgetOptions: readonly string[] = ["節約思考", "標準", "品質重視"];
+
+export const cookingFrequencyOptions: readonly string[] = [
+  "毎日",
+  "週4-5回",
+  "週2-3回",
+  "週1回以下",
+];
