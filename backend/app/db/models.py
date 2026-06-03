@@ -34,3 +34,13 @@ class ShoppingListItem(Base):
         onupdate=func.now(),
     )
     
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String(64), nullable=False, unique=True, index=True)
+    language = Column(String(10), nullable=False, default="ja")
+    family_size = Column(Integer, nullable=False, default=1)
+    dietary = Column(String(255), nullable=False, default="")
+    allergies = Column(String(255), nullable=False, default="")
+    cooking_frequency = Column(String(50), nullable=False, default="")
+    budget = Column(String(50), nullable=False, default="")

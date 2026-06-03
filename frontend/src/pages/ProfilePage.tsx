@@ -1,15 +1,17 @@
 import { ChefHat, Globe, Heart, User } from "lucide-react";
 import Header from "../components/Header";
 import "../styles/ProfilePage.css";
-import { useState } from "react";
-import type { Language } from "../types/FoodType";
+import { useEffect, useState } from "react";
+import type { Language, UserProfile } from "../types/FoodType";
 import {
   allergyOptions,
+  API_BASE_URL,
   budgetOptions,
   cookingFrequencyOptions,
   dietaryOptions,
   languageNames,
 } from "../constants";
+import { fetchProfile } from "../Client";
 
 const ProfilePage = ({ userId }: { userId: string }) => {
   const [language, setLanguage] = useState<Language>("ja");
@@ -19,6 +21,33 @@ const ProfilePage = ({ userId }: { userId: string }) => {
   const [cookingFrequency, setCookingFrequency] = useState<string>("");
   const [budgetLevel, setBudgetLevel] = useState<string>("");
 
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const profile = await fetchProfile(userId);
+        if (!cancelled && profile) {
+          updateProfile(profile);
+        }
+      } catch (e) {
+        console.error("ユーザープロフィール取得失敗", e);
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  const updateProfile = async (profileData: UserProfile) => {
+    setLanguage(profileData.language);
+    setFamilySize(profileData.family_size);
+    setSelectedDietary(profileData.dietary);
+    setSelectedAllergies(profileData.allergies);
+    setCookingFrequency(profileData.cooking_frequency);
+    setBudgetLevel(profileData.budget);
+  };
+  
   const toggleDietary = (option: string) => {
     setSelectedDietary((prev) =>
       prev.includes(option) ? prev.filter((v) => v !== option) : [...prev, option]
@@ -31,17 +60,31 @@ const ProfilePage = ({ userId }: { userId: string }) => {
     );
   };
 
-  const handleSave = () => {
-    console.log({
-      userId,
-      language,
-      familySize: familySize,
-      dietaryPreferences: selectedDietary,
-      commonAllergies: selectedAllergies,
-      cookingFrequency,
-      budgetLevel,
+  const handleSave = async () => {
+    const response = await fetch(`${API_BASE_URL}/profile/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        language,
+        user_id: userId,
+        family_size: familySize,
+        dietary: selectedDietary,
+        allergies: selectedAllergies,
+        cooking_frequency: cookingFrequency,
+        budget: budgetLevel,
+      }),
     });
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(`POST /profile failed: ${response.status} ${body}`);
+    }
+    const data = await response.json();
+    updateProfile(data).then(() => console.log("Profile updated:", data));
   };
+
   return (
     <>
       <Header title="プロフィール" userId={userId} />

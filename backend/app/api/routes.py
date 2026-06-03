@@ -133,3 +133,20 @@ def delete_shopping_item(item_id: int, db: Session = Depends(get_db)):
 #     if not item:
 #         raise HTTPException(status_code=404, detail="アイテムが見つかりませんでした")
 #     return item
+
+# =============================================================
+# プロフィール /profile/
+# =============================================================
+
+# プロファイル取得
+@router.get("/profile/", response_model=schemas.ProfileResponse)
+def get_profile(user_id: str, db: Session = Depends(get_db)):
+    profile = crud.get_profile_by_user_id(db, user_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="プロフィールが見つかりませんでした")
+    return profile
+
+# プロファイル追加・更新
+@router.post("/profile/", response_model=schemas.ProfileResponse)
+def create_profile(data: schemas.ProfileCreate, db: Session = Depends(get_db)):
+    return crud.create_profile(db, data)

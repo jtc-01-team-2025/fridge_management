@@ -1,5 +1,5 @@
 // src/Client.ts
-import type { FoodType, FoodTypeNew, ShoppingItem } from "./types/FoodType";
+import type { FoodType, FoodTypeNew, ShoppingItem, UserProfile } from "./types/FoodType";
 
 // 環境変数からAPIのベースURLを取得。取得できない場合はローカル環境のデフォルトURLを使用。
 // 例: "http://127.0.0.1:8000"
@@ -153,5 +153,35 @@ export async function updateShoppingItemCheck(
     unit: data.unit,
     category: data.category as ShoppingItem["category"],
     checked: data.checked,
+  };
+}
+
+// ----------------------------------------------------
+// 3. カテゴリごとにグループ化された食材を取得する関数 (GET)
+// ----------------------------------------------------
+
+export async function fetchProfile(userId: string): Promise<UserProfile | null> {
+  const url = `${API_BASE_URL}/profile/?user_id=${encodeURIComponent(userId)}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    return null;
+    //2026/6/4 リファクタリング課題：プロファイルないと404エラーかえってくるので、エラーにするのではなくnullを返すようになっている。実装目線で仕様をどうするか検討する必要がある。
+    // const body = await response.text().catch(() => "");
+    // throw new Error(`GET /profile failed: ${response.status} ${body}`);
+  }
+
+  const data = await response.json();
+
+  if (!data) {
+    throw new Error("User profile not found");
+  }
+
+  return {
+    ...data,
+    userId: data.user_id,
   };
 }

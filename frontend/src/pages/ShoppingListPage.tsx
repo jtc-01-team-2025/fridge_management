@@ -7,28 +7,7 @@ import { useEffect, useState } from "react";
 import type { ShoppingItem } from "../types/FoodType";
 import { deleteShoppingItem, fetchShoppingList, updateShoppingItemCheck } from "../Client";
 
-// テスト用のダミーデータ
-// const shoppingItemsDemoData: ShoppingItem[] = [
-//   {
-//     id: "1",
-//     name: "牛乳",
-//     quantity: 2,
-//     unit: "本",
-//     category: "乳製品",
-//     checked: false,
-//   },
-//   {
-//     id: "2",
-//     name: "卵",
-//     quantity: 12,
-//     unit: "個",
-//     category: "乳製品",
-//     checked: false,
-//   },
-// ];
-
 export const ShoppingListPage = ({ userId }: { userId: string }) => {
-  // const uncheckedItems: ShoppingItem[] = shoppingItemsDemoData;
   const [shoppingList, setShoppingList] = useState<ShoppingItem[]>([]);
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
 

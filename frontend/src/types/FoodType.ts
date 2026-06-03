@@ -33,3 +33,14 @@ export type ShoppingItem = {
 };
 
 export type Language = "ja" | "en" | "zh" | "ko";
+
+export type UserProfile = {
+  id: number;
+  family_size: number;
+  userId: string;
+  language: Language;
+  dietary: string[];
+  allergies: string[];
+  cooking_frequency: string;
+  budget: string;
+};

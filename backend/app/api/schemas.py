@@ -74,7 +74,26 @@ class ShoppingItemResponse(BaseModel):
 class ShoppingItemCheckRequest(BaseModel):
     checked: bool
 
+# --- Profile ---
+class ProfileCreate(BaseModel):
+    user_id: str
+    language: str = "ja"
+    family_size: int = 1
+    dietary: list[str] = []
+    allergies: list[str] = []
+    cooking_frequency: str = ""
+    budget: str = ""
 
+class ProfileResponse(BaseModel):
+    id: int
+    user_id: str
+    language: str
+    family_size: int
+    dietary: list[str]
+    allergies: list[str]
+    cooking_frequency: str
+    budget: str
+    
+    class Config:
+        from_attributes = True
 
-
-   

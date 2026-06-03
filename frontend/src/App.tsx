@@ -28,73 +28,6 @@ const getOrCreateUserId = (): string => {
   return userId;
 };
 
-// --- 2. 共通パーツ (CSSを反映させるための構造) ---
-
-// const Header = ({
-//   navigate,
-//   currentPage,
-// }: {
-//   navigate: (path: string) => void;
-//   currentPage: string;
-// }) => (
-//   // インラインスタイルで App.css と調和する色を設定
-//   <header
-//     style={{
-//       backgroundColor: "#38c172",
-//       padding: "15px 0",
-//       color: "white",
-//       boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-//     }}
-//   >
-//     <div
-//       style={{
-//         maxWidth: "1000px",
-//         margin: "0 auto",
-//         display: "flex",
-//         justifyContent: "space-between",
-//         alignItems: "center",
-//         padding: "0 20px",
-//       }}
-//     >
-//       <h2 style={{ margin: 0 }}>🧊 Fridge Manager</h2>
-//       <nav>
-//         <button
-//           onClick={() => navigate("/")}
-//           className={`action-button ${currentPage === "home" ? "primary" : ""}`}
-//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-//         >
-//           ホーム
-//         </button>
-//         <button
-//           onClick={() => navigate("/add")}
-//           className={`action-button ${currentPage === "add" ? "primary" : ""}`}
-//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-//         >
-//           登録
-//         </button>
-//         <button
-//           onClick={() => navigate("/delete")}
-//           className={`action-button ${currentPage === "delete" ? "primary" : ""}`}
-//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-//         >
-//           削除
-//         </button>
-//         <button
-//           onClick={() => navigate("/login")}
-//           className={`action-button ${currentPage === "delete" ? "primary" : ""}`}
-//           style={{ padding: "8px 15px", marginLeft: "10px", fontSize: "0.9em" }}
-//         >
-//           ログイン
-//         </button>
-//       </nav>
-//     </div>
-//   </header>
-// );
-
-// --- 3. メインAppコンポーネント ---
-
-// type Page = "home" | "delete" | "add" | "consume";
-
 export function App() {
   const [data, setData] = useState<FoodTypeNew[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -119,11 +52,6 @@ export function App() {
             (a, b) => new Date(a.date_expiration).getTime() - new Date(b.date_expiration).getTime()
           )
         );
-
-        // カテゴリごとにグループ化されたデータを取得
-        // const groupedResponse = await fetch(`${API_BASE_URL}/items/grouped/`, {
-        //   headers: { "X-User-Id": userId },
-        // });
       } else {
         setData(generateTestItems(5));
       }
@@ -172,37 +100,6 @@ export function App() {
     } catch (e) { console.error(e); throw e; }
   }, [userId, fetchItems]);
 
-  // const handleDeleteItem = useCallback(
-  //   async (id: number) => {
-  //     try {
-  //       await fetch(`${API_BASE_URL}/items`, {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json", "X-User-Id": userId },
-  //         body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
-  //       });
-  //       await fetchItems();
-  //     } catch (e) {
-  //       console.error(e);
-  //       throw e;
-  //     }
-  //   },
-  //   [userId, fetchItems]
-  // );
-
-  // const handleDeleteItems = useCallback(async (ids: number[]) => {
-  //   try {
-  //     await Promise.all(
-  //       ids.map((id) =>
-  //         fetch(`${API_BASE_URL}/items/${id}`, {
-  //           method: "DELETE",
-  //           headers: { "X-User-Id": userId },
-  //         })
-  //       )
-  //     );
-  //     await fetchItems();
-  //   } catch (e) { console.error(e); throw e; }
-  // }, [userId, fetchItems]);
-
   const handleConsumeItem = useCallback(
     async (id: number, quantity: number) => {
       try {
@@ -236,26 +133,6 @@ export function App() {
       }),
     [data]
   );
-
-  // const handleDeleteItems = useCallback(
-  //   async (ids: number[]) => {
-  //     try {
-  //       await Promise.all(
-  //         ids.map((id) =>
-  //           fetch(`${API_BASE_URL}/items/${id}`, {
-  //             method: "DELETE",
-  //             headers: { "X-User-Id": userId },
-  //           })
-  //         )
-  //       );
-  //       await fetchItems();
-  //     } catch (e) {
-  //       console.error(e);
-  //       throw e;
-  //     }
-  //   },
-  //   [userId, fetchItems]
-  // );
 
   const togglePopup = () => setIsPopupVisible(!isPopupVisible);
 

@@ -133,3 +133,64 @@ def delete_shopping_item(db: Session, item_id: int) -> bool:
     db.delete(item)
     db.commit()
     return True
+
+# --- プロフィール ---
+def get_profile_by_user_id(db: Session, user_id: str):
+    profile = (
+        db.query(models.UserProfile)
+        .filter(models.UserProfile.user_id == user_id)
+        .first()
+    )
+    if not profile:
+        return None
+
+    return {
+        "id": profile.id,
+        "user_id": profile.user_id,
+        "family_size": profile.family_size,
+        "language": profile.language,
+        "dietary": [x for x in profile.dietary.split(",") if x],
+        "allergies": [x for x in profile.allergies.split(",") if x],
+        "cooking_frequency": profile.cooking_frequency,
+        "budget": profile.budget,
+    }
+
+def create_profile(db: Session, data: schemas.ProfileCreate):
+    profile = (
+        db.query(models.UserProfile)
+        .filter(models.UserProfile.user_id == data.user_id)
+        .first()
+        )
+        
+    dietary_csv = ",".join(data.dietary)
+    allergies_csv = ",".join(data.allergies)
+    if profile:
+        profile.language = data.language
+        profile.family_size = data.family_size
+        profile.dietary = dietary_csv
+        profile.allergies = allergies_csv
+        profile.cooking_frequency = data.cooking_frequency
+        profile.budget = data.budget
+    else:
+        profile = models.UserProfile(
+            user_id=data.user_id,
+            language=data.language,
+            dietary=dietary_csv,
+            allergies=allergies_csv,
+            cooking_frequency=data.cooking_frequency,
+            budget=data.budget,
+            family_size=data.family_size,
+        )
+    db.add(profile)
+    db.commit()
+    db.refresh(profile)
+    return {
+    "id": profile.id,
+    "user_id": profile.user_id,
+    "language": profile.language,
+    "family_size": profile.family_size,
+    "dietary": [x for x in profile.dietary.split(",") if x],
+    "allergies": [x for x in profile.allergies.split(",") if x],
+    "cooking_frequency": profile.cooking_frequency,
+    "budget": profile.budget,
+    }
