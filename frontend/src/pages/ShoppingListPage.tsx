@@ -16,6 +16,7 @@ export const ShoppingListPage = ({ userId }: { userId: string }) => {
     const run = async () => {
       try {
         const items = await fetchShoppingList(userId);
+        console.log("Fetched shopping list:", items);
         if (!cancelled) setShoppingList(items);
       } catch (e) {
         console.error("買い物リスト取得失敗", e);

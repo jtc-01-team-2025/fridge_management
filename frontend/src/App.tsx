@@ -6,7 +6,7 @@ import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
 import type { FoodTypeNew } from "./types/FoodType";
 import { generateTestItems } from "./utils/generateDummyData";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PopUp from "./components/PopUP";
 import Footer from "./components/Footer";
@@ -19,24 +19,54 @@ import { ChatPage } from "./pages/ChatPage";
 // --- 1. API設定 & ユーザー管理 ---
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
-const getOrCreateUserId = (): string => {
-  let userId = localStorage.getItem("app_user_id");
-  if (!userId) {
-    userId = `user-${Math.random().toString(36).substring(2, 11)}`;
-    localStorage.setItem("app_user_id", userId);
+const getUserId = (): string => {
+  const raw = localStorage.getItem("app_user_session");
+  if (!raw) return "";
+  try {
+    const parsed = JSON.parse(raw) as { userId?: string; expiresAt?: number };
+    if (!parsed.userId || !parsed.expiresAt) return "";
+    if (Date.now() > parsed.expiresAt) {
+      localStorage.removeItem("app_user_session");
+      return "";
+    }
+    return parsed.userId;
+  } catch {
+    localStorage.removeItem("app_user_session");
+    return "";
   }
-  return userId;
 };
+// const getOrCreateUserId = (): string => {
+//   const navigate = useNavigate();
+//   const userId = localStorage.getItem("app_user_id");
+//   if (!userId) {
+//     userId = `user-${Math.random().toString(36).substring(2, 11)}`;
+//     localStorage.setItem("app_user_id", userId);
+//     navigate("/login");
+//   }
+//   return userId || "";
+// };
 
 export function App() {
   const [data, setData] = useState<FoodTypeNew[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const useApiFlag = import.meta.env.VITE_USE_API === "true";
-  const userId = useMemo(() => getOrCreateUserId(), []);
+  const navigate = useNavigate();
+  const [userId] = useState<string>(() => getUserId());
+
+  useEffect(() => {
+    if (!userId) {
+      navigate("/login");
+    }
+  }, [userId, navigate]);
 
   // データ取得ロジック
   const fetchItems = useCallback(async () => {
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
       if (useApiFlag) {
@@ -68,37 +98,50 @@ export function App() {
 
   // CRUD操作
 
-  // kyoji 
   // const handleAddItem = useCallback(
   //   async (name: string, days: number, quantity: number, category: string) => {
   //     const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
   //       .toISOString()
   //       .split("T")[0];
-  const handleAddItem = useCallback(async (name: string, days: number, quantity: number, category: number) => {
-    const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-    try {
-      await fetch(`${API_BASE_URL}/items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-User-Id": userId },
-        body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
-      });
-      await fetchItems();
-    } catch (e) { console.error(e); throw e; }
-  }, [userId, fetchItems]);
+  const handleAddItem = useCallback(
+    async (name: string, days: number, quantity: number, category: number) => {
+      const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+      try {
+        await fetch(`${API_BASE_URL}/items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-User-Id": userId },
+          body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
+        });
+        await fetchItems();
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+    [userId, fetchItems]
+  );
 
-  const handleDeleteItems = useCallback(async (ids: number[]) => {
-    try {
-      await Promise.all(
-        ids.map((id) =>
-          fetch(`${API_BASE_URL}/items/${id}`, {
-            method: "DELETE",
-            headers: { "X-User-Id": userId },
-          })
-        )
-      );
-      await fetchItems();
-    } catch (e) { console.error(e); throw e; }
-  }, [userId, fetchItems]);
+  const handleDeleteItems = useCallback(
+    async (ids: number[]) => {
+      try {
+        await Promise.all(
+          ids.map((id) =>
+            fetch(`${API_BASE_URL}/items/${id}`, {
+              method: "DELETE",
+              headers: { "X-User-Id": userId },
+            })
+          )
+        );
+        await fetchItems();
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+    [userId, fetchItems]
+  );
 
   const handleConsumeItem = useCallback(
     async (id: number, quantity: number) => {
@@ -121,7 +164,7 @@ export function App() {
         throw e;
       }
     },
-    [userId, fetchItems]
+    [userId, fetchItems, useApiFlag]
   );
 
   const urgentItems = useMemo(

@@ -169,3 +169,31 @@
   line-height: 1;
 }
 
+.home-mobile-login-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.home-mobile-login-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.home-mobile-login-button:active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.home-mobile-login-icon {
+  width: 1rem;
+  height: 1rem;
+}
