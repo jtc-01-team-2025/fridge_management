@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional, List
+from typing import Optional, List, Union
 
 
 class FridgeContentsBase(BaseModel):
     #id: int
     name: str
     # store category id when creating/updating; string names are also accepted and normalized by backend
-    category: int | str
+    category: Union[int, str]
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int
@@ -51,7 +51,7 @@ class ShoppingItemCreate(BaseModel):
     name: str
     quantity: int
     unit: str = "個"
-    category: str | int
+    category: Union[str, int]
     user_id: str = ""
 
     class Config:
@@ -64,7 +64,7 @@ class ShoppingItemResponse(BaseModel):
     name: str
     quantity: int
     unit: str
-    category: str | int
+    category: Union[str, int]
     checked: bool
 
     class Config:

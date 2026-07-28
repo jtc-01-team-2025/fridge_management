@@ -3,6 +3,7 @@ Category mapping utilities: store categories as integers in DB,
 but expose names in API responses.
 """
 from typing import Dict
+from typing import Union
 
 # Default category mapping. Keys are integers stored in DB; values are display names.
 CATEGORY_MAP: Dict[int, str] = {
@@ -25,7 +26,7 @@ def id_to_name(cat_id: int) -> str:
         return CATEGORY_MAP[9]
 
 
-def name_to_id(category: int | str) -> int:
+def name_to_id(category: Union[int, str]) -> int:
     if isinstance(category, int):
         return category if category in CATEGORY_MAP else 9
 

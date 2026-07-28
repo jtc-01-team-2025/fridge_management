@@ -3,27 +3,57 @@ import "../styles/Login.css";
 import { ChevronLeft, Refrigerator } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "../components/LoginForm";
+import { supabase } from "../lib/supabaseClient";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
 const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleSubmit = async (email: string, password: string) => {
     setIsLoading(true);
 
-    // ここでログイン処理を実装する
-    if (email !== "" && password !== "") {
-      const userId = `user-${Math.random().toString(36).substring(2, 11)}`;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error || !data.session) {
+        setIsLoading(false);
+        return;
+      }
+
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          supabase_session: {
+            access_token: data.session.access_token,
+            token_type: data.session.token_type,
+            expires_in: data.session.expires_in,
+            expires_at: data.session.expires_at,
+            refresh_token: data.session.refresh_token,
+            user: data.session.user,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        setIsLoading(false);
+        return;
+      }
+
       const ttlMs = 5 * 60 * 60 * 1000;
       localStorage.setItem(
         "app_user_session",
-        JSON.stringify({ userId, expiresAt: Date.now() + ttlMs })
+        JSON.stringify({ userId: data.session.user.id, expiresAt: Date.now() + ttlMs })
       );
-      // supabaseに認証にいくー安井さん
-      // 認証成功の場合（200）は、tokenが返ってくる
-      // tokenを元に、/auth/login APIにリクエストを送る。
+
       setTimeout(() => {
         setIsLoading(false);
         navigate("/");
       }, 900);
+    } catch {
+      setIsLoading(false);
     }
   };
 
