@@ -5,3 +5,6 @@ pydantic
 pymysql
 mysql-connector-python
 SQLAlchemy            
+passlib[bcrypt]
+python-jose[cryptography]
+httpx

@@ -1,5 +1,5 @@
 from datetime import date
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.api import crud, schemas
 from app.db.database import get_db
@@ -8,6 +8,7 @@ from app.api import shopping_utils
 from typing import Optional
 from app.db import models
 from app.api.categories import id_to_name
+from app.services import auth_service
 
 router = APIRouter()
 
@@ -150,3 +151,20 @@ def get_profile(user_id: str, db: Session = Depends(get_db)):
 @router.post("/profile/", response_model=schemas.ProfileResponse)
 def create_profile(data: schemas.ProfileCreate, db: Session = Depends(get_db)):
     return crud.create_profile(db, data)
+
+
+# --- Authentication ---
+@router.post("/auth/login", response_model=schemas.TokenResponse)
+def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
+    # If frontend forwards a Supabase session, do NOT create or modify local users.
+    # For security, accept the session's user id and issue an app JWT with that id as `sub`.
+    if getattr(data, "supabase_session", None):
+        sup_sess = data.supabase_session
+        sup_user = sup_sess.user
+        if not sup_user or not getattr(sup_user, "id", None):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Supabase session missing user information.")
+        # Do NOT touch local DB. Issue app token for the Supabase user id.
+        access_token = auth_service.create_access_token({"sub": sup_user.id})
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Supabase session is required.")

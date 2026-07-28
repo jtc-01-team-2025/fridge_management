@@ -17,6 +17,9 @@ const Login: React.FC = () => {
         "app_user_session",
         JSON.stringify({ userId, expiresAt: Date.now() + ttlMs })
       );
+      // supabaseに認証にいくー安井さん
+      // 認証成功の場合（200）は、tokenが返ってくる
+      // tokenを元に、/auth/login APIにリクエストを送る。
       setTimeout(() => {
         setIsLoading(false);
         navigate("/");

@@ -97,3 +97,28 @@ class ProfileResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+# --- Auth ---
+class LoginRequest(BaseModel):
+    # Optional Supabase session object forwarded from frontend
+    class SupabaseUser(BaseModel):
+        id: str
+        aud: Optional[str] = None
+        role: Optional[str] = None
+        email: Optional[str] = None
+
+    class SupabaseSession(BaseModel):
+        access_token: str
+        token_type: Optional[str] = None
+        expires_in: Optional[int] = None
+        expires_at: Optional[int] = None
+        refresh_token: Optional[str] = None
+        user: Optional[SupabaseUser] = None
+
+    supabase_session: Optional[SupabaseSession] = None
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
