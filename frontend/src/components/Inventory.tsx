@@ -20,6 +20,7 @@ const Inventory = ({
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [isReceiptPopupOpen, setIsReceiptPopupOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "fridge">("list");
   const getDaysUntilExpiry = (expiryDate: string): number => {
     const today = new Date();
     const expiry = new Date(expiryDate);
@@ -132,17 +133,68 @@ const Inventory = ({
 
           <div className="inventory-tabs">
             <div className="inventory-tabs-list">
-              <button className="inventory-tabs-trigger" data-state="active">
+              <button
+                className="inventory-tabs-trigger"
+                data-state={viewMode === "list" ? "active" : "inactive"}
+                onClick={() => setViewMode("list")}
+              >
                 <div className="inventory-tabs-icon" />
                 リスト
               </button>
-              <button className="inventory-tabs-trigger">
+              <button
+                className="inventory-tabs-trigger"
+                data-state={viewMode === "fridge" ? "active" : "inactive"}
+                onClick={() => setViewMode("fridge")}
+              >
                 <div className="inventory-tabs-icon" />
                 冷蔵庫
               </button>
             </div>
 
             <div className="inventory-tabs-content">
+              {viewMode === "fridge" ? (
+                <div className="inventory-card-list">
+                  {Object.entries(
+                    inventories
+                      .filter((item) => item.location === "冷蔵")
+                      .reduce<Record<string, FoodTypeNew[]>>((acc, item) => {
+                      const cat = item.category || "その他";
+                      if (!acc[cat]) acc[cat] = [];
+                      acc[cat].push(item);
+                      return acc;
+                    }, {})
+                  ).map(([cat, items]) => (
+                    <div key={cat} style={{ marginBottom: "16px" }}>
+                      <h4 style={{ fontSize: "0.85rem", fontWeight: 700, color: "#6b7280", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                        {cat} ({items.length})
+                      </h4>
+                      {items.map((item) => (
+                        <div key={item.id} className="inventory-card">
+                          <div className="inventory-card-content">
+                            <div className="inventory-card-top">
+                              <div className="inventory-card-main">
+                                <h3 className="inventory-card-name">{item.name}</h3>
+                              </div>
+                              <div className="inventory-card-qty">
+                                <p className="inventory-card-qty-value">
+                                  {item.quantity}<span className="inventory-card-qty-unit">個</span>
+                                </p>
+                              </div>
+                            </div>
+                            <div className="inventory-card-bottom">
+                              {getExpiryBadge(item.date_expiration)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                  {inventories.filter((item) => item.location === "冷蔵").length === 0 && (
+                    <p style={{ color: "#9ca3af", textAlign: "center", padding: "40px 0" }}>冷蔵の食材がありません</p>
+                  )}
+                </div>
+              ) : (
+              <>
               <div className="inventory-chip-row">
                 <button
                   onClick={() => setFilterCategory("all")}
@@ -182,7 +234,7 @@ const Inventory = ({
                               {item.category ? item.category : "不明"}
                             </span>
                             <span className="inventory-card-meta-dot">•</span>
-                            <span className="inventory-card-meta-text">冷蔵</span>
+                            <span className="inventory-card-meta-text">{item.location || "冷蔵"}</span>
                           </div>
                         </div>
 
@@ -220,6 +272,8 @@ const Inventory = ({
                   </div>
                 ))}
               </div>
+              </>
+              )}
             </div>
             {/* <Tabs
             value={viewMode}

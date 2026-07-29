@@ -9,9 +9,10 @@ def create_item(db: Session, item: schemas.ItemCreate):
     db_item = models.FridgeContents(
         name=item.name,
         category=item.category,
-        date_purchase=item.date_purchase,  
+        date_purchase=item.date_purchase,
         date_expiration=item.date_expiration,
-        quantity=item.quantity
+        quantity=item.quantity,
+        location=item.location,
     )
 
     #入力されたデータをテーブルに格納
@@ -36,6 +37,7 @@ def get_items_sorted(db: Session):
             "date_purchase": getattr(it, "date_purchase", None),
             "date_expiration": getattr(it, "date_expiration", None),
             "quantity": getattr(it, "quantity", 0),
+            "location": getattr(it, "location", "冷蔵"),
         })
     return result
 

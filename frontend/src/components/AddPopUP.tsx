@@ -9,6 +9,7 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [category, setCategory] = useState(9);
+  const [location, setLocation] = useState("冷蔵");
 
   const handleAddItem = () => async (name: string, date: Date, quantity: number) => {
     try {
@@ -20,6 +21,7 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
           date_expiration: date.toISOString().split("T")[0],
           quantity,
           category,
+          location,
         }),
       });
     } catch (e) {
@@ -181,7 +183,8 @@ const AddPopUP = ({ closePopup }: { closePopup: () => void }) => {
           </label>
           <select
             id="location"
-            // required
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
             disabled={isLoading}
             className="popup-input"
           >

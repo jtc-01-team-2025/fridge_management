@@ -5,6 +5,7 @@ export interface FoodTypeNew {
   category: string; // カテゴリ
   date_expiration: string; // YYYY-MM-DD 形式
   quantity: number;
+  location: string; // 保存場所（冷蔵・冷凍・常温）
 }
 export interface FoodType {
   itemID: number; // アイテムの一意の識別子

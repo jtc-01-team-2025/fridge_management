@@ -11,6 +11,7 @@ class FridgeContentsBase(BaseModel):
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int
+    location: str = "冷蔵"
 
     class Config:
         from_attributes = True
@@ -37,6 +38,7 @@ class ItemResponse(BaseModel):
     date_purchase: Optional[date] = None
     date_expiration: date
     quantity: int
+    location: str = "冷蔵"
 
     class Config:
         from_attributes = True
@@ -99,22 +101,21 @@ class ProfileResponse(BaseModel):
 
 
 # --- Auth ---
+class SupabaseUser(BaseModel):
+    id: str
+    aud: Optional[str] = None
+    role: Optional[str] = None
+    email: Optional[str] = None
+
+class SupabaseSession(BaseModel):
+    access_token: str
+    token_type: Optional[str] = None
+    expires_in: Optional[int] = None
+    expires_at: Optional[int] = None
+    refresh_token: Optional[str] = None
+    user: Optional[SupabaseUser] = None
+
 class LoginRequest(BaseModel):
-    # Optional Supabase session object forwarded from frontend
-    class SupabaseUser(BaseModel):
-        id: str
-        aud: Optional[str] = None
-        role: Optional[str] = None
-        email: Optional[str] = None
-
-    class SupabaseSession(BaseModel):
-        access_token: str
-        token_type: Optional[str] = None
-        expires_in: Optional[int] = None
-        expires_at: Optional[int] = None
-        refresh_token: Optional[str] = None
-        user: Optional[SupabaseUser] = None
-
     supabase_session: Optional[SupabaseSession] = None
 
 

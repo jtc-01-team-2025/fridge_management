@@ -33,6 +33,7 @@ def create_item(data: ItemCreate, db: Session):
             "date_purchase": existing_item.date_purchase,
             "date_expiration": existing_item.date_expiration,
             "quantity": existing_item.quantity,
+            "location": existing_item.location,
         }
     else:
         # 新しいアイテムを作成
@@ -41,7 +42,8 @@ def create_item(data: ItemCreate, db: Session):
             category=category_id,
             date_purchase=data.date_purchase,
             date_expiration=data.date_expiration,
-            quantity=data.quantity
+            quantity=data.quantity,
+            location=data.location,
         )
         db.add(new_item)
         db.commit()
@@ -53,6 +55,7 @@ def create_item(data: ItemCreate, db: Session):
             "date_purchase": new_item.date_purchase,
             "date_expiration": new_item.date_expiration,
             "quantity": new_item.quantity,
+            "location": new_item.location,
         }
 
 

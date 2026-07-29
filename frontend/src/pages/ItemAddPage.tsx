@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { FOOD_CATEGORIES } from "../constants";
+
+import { FOOD_CATEGORIES, locations } from "../constants";
 
 export const ItemAddPage = ({
   onBack,
   onAddItem,
 }: {
   onBack: () => void;
-  onAddItem: (name: string, days: number, quantity: number, category: number) => Promise<void>;
+  onAddItem: (name: string, days: number, quantity: number, category: number, location: string) => Promise<void>;
 }) => {
   const [itemName, setItemName] = useState("");
   const [days, setDays] = useState(7);
@@ -14,6 +15,7 @@ export const ItemAddPage = ({
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [category, setCategory] = useState(9);
+  const [location, setLocation] = useState("冷蔵");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export const ItemAddPage = ({
       setIsLoading(true);
       setError(null);
       try {
-        await onAddItem(itemName.trim(), days, quantity, category);
+        await onAddItem(itemName.trim(), days, quantity, category, location);
         onBack();
       } catch (err) {
         console.error("登録エラー:", err);
@@ -112,6 +114,21 @@ export const ItemAddPage = ({
               <option key={cat.id} value={cat.id}>
                 {cat.label}
               </option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <label htmlFor="location" style={{ fontWeight: 'bold', color: '#555' }}>保存場所</label>
+          <select
+            id="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            disabled={isLoading}
+            style={{ padding: '12px', borderRadius: '8px', border: '1px solid #38c172', fontSize: '1rem' }}
+          >
+            {locations.map((loc) => (
+              <option key={loc} value={loc}>{loc}</option>
             ))}
           </select>
         </div>

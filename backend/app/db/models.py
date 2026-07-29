@@ -14,6 +14,7 @@ class FridgeContents(Base):
     date_purchase = Column(Date, nullable=True)
     date_expiration = Column(Date, nullable=False)
     quantity = Column(Integer, nullable=False)
+    location = Column(String(20), nullable=False, default="冷蔵")
 
 class ShoppingListItem(Base):
     __tablename__ = "shopping_list_items"

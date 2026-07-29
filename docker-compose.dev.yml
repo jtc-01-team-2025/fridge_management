@@ -47,7 +47,7 @@ services:
       MYSQL_PASSWORD: fridge_pass
       DEBUG: "True"
     volumes:
-      - ./backend:/app
+      - ./backend:/fridge
     networks:
       - app_network
     depends_on:

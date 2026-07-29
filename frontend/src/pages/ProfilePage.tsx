@@ -1,4 +1,4 @@
-import { ChefHat, Globe, Heart, User } from "lucide-react";
+import { ChefHat, Globe, Heart, LogOut, User } from "lucide-react";
 import Header from "../components/Header";
 import "../styles/ProfilePage.css";
 import { useEffect, useState } from "react";
@@ -12,6 +12,7 @@ import {
   languageNames,
 } from "../constants";
 import { fetchProfile } from "../Client";
+import { supabase } from "../lib/supabaseClient";
 
 const ProfilePage = ({ userId }: { userId: string }) => {
   const [language, setLanguage] = useState<Language>("ja");
@@ -58,6 +59,12 @@ const ProfilePage = ({ userId }: { userId: string }) => {
     setSelectedAllergies((prev) =>
       prev.includes(option) ? prev.filter((v) => v !== option) : [...prev, option]
     );
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem("app_user_session");
+    window.location.href = "/login";
   };
 
   const handleSave = async () => {
@@ -227,6 +234,10 @@ const ProfilePage = ({ userId }: { userId: string }) => {
         </div>
         <button type="button" onClick={handleSave} className="save-button">
           保存
+        </button>
+        <button type="button" onClick={handleLogout} className="logout-button">
+          <LogOut size={16} />
+          ログアウト
         </button>
       </div>
     </>

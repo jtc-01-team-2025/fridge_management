@@ -52,13 +52,16 @@ export function App() {
   const [isLoading, setIsLoading] = useState(true);
   const useApiFlag = import.meta.env.VITE_USE_API === "true";
   const navigate = useNavigate();
-  const [userId] = useState<string>(() => getUserId());
+  const [userId, setUserId] = useState<string>(() => getUserId());
 
   useEffect(() => {
-    if (!userId) {
+    const id = getUserId();
+    if (!id) {
       navigate("/login");
+    } else {
+      setUserId(id);
     }
-  }, [userId, navigate]);
+  }, [navigate]);
 
   // データ取得ロジック
   const fetchItems = useCallback(async () => {
@@ -104,7 +107,7 @@ export function App() {
   //       .toISOString()
   //       .split("T")[0];
   const handleAddItem = useCallback(
-    async (name: string, days: number, quantity: number, category: number) => {
+    async (name: string, days: number, quantity: number, category: number, location: string = "冷蔵") => {
       const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0];
@@ -112,7 +115,7 @@ export function App() {
         await fetch(`${API_BASE_URL}/items`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-User-Id": userId },
-          body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category }),
+          body: JSON.stringify({ name, date_expiration: expiryDate, quantity, category, location }),
         });
         await fetchItems();
       } catch (e) {
