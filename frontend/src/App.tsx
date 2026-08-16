@@ -6,7 +6,7 @@ import { HomePage } from "./pages/HomePage";
 import { ItemDeletePage } from "./pages/ItemDeletePage";
 import type { FoodTypeNew } from "./types/FoodType";
 import { generateTestItems } from "./utils/generateDummyData";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PopUp from "./components/PopUP";
 import Footer from "./components/Footer";
@@ -52,6 +52,7 @@ export function App() {
   const [isLoading, setIsLoading] = useState(true);
   const useApiFlag = import.meta.env.VITE_USE_API === "true";
   const navigate = useNavigate();
+  const location = useLocation();   //追加　20260810
   const [userId] = useState<string>(() => getUserId());
 
   useEffect(() => {
@@ -242,8 +243,9 @@ export function App() {
               <Route path="/shopping" element={<ShoppingListPage userId={userId} />} />
               <Route path="/chat" element={<ChatPage userId={userId} />} />
             </Routes>
-          </ErrorBoundary>
-          <Footer />
+         </ErrorBoundary>
+           {/*20260810認証成功時のみ下のタブが表示される形式に変更*/}
+          {userId && location.pathname !== "/login" && <Footer />}
         </>
       )}
     </div>

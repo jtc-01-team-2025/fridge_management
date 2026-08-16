@@ -47,14 +47,17 @@ const Login: React.FC = () => {
         "app_user_session",
         JSON.stringify({ userId: data.session.user.id, expiresAt: Date.now() + ttlMs })
       );
-
+    
+    //20260811変更
       setTimeout(() => {
         setIsLoading(false);
-        navigate("/");
+        window.location.href = "/";
       }, 900);
-    } catch {
+    } catch (err) {
+      console.error("ログインエラー:", err);   // ← これを追加する
       setIsLoading(false);
     }
+
   };
 
   return (

@@ -22,8 +22,8 @@ def on_startup():
 # 2026/4/11 リファクタリング課題：Corsが全部空いているため、セキュリティ上のリスクがある。必要なオリジンだけを許可するように変更する。
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
-    # allow_origins=["http://localhost:5173"],  
+    #allow_origins=["*"],  
+    allow_origins=["http://localhost:5173"],   #202608修正　
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
